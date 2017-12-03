@@ -33,5 +33,12 @@ int main() {
 
     cout << "Cross of 2-dim vecs u2 and v2 is: " << u2.operatorX(v2) << endl;
 
+    vec3 x(2,-3,1);
+
+    cout << "Triple product: " << v.operatorTriple(u,x) << endl;
+
+    vec3 xNorm = x.normalize();
+    cout << "Normalized x: " << xNorm << endl;
+
     return 0;
 }

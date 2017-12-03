@@ -10,25 +10,24 @@ int vec::dim() {
         return (int) coordinates.size();
 }
 
-double vec::norm(vec *v) {
-
-    double sum = 0;
-    int dim = v->dim();
+float vec::normSquared() {
+    float sum = 0;
+    int dim = this->dim();
 
     for (int i=0; i<dim; i++)
-        sum += v->coordinates[i]*v->coordinates[i];
+        sum += coordinates[i]*coordinates[i];
 
-    return std::sqrt(sum);
+    return sum;
 }
 
-double vec::norm() {
-   return vec::norm(this);
+float vec::norm() {
+   return std::sqrt(this->normSquared());
 }
 
-double vec::operator*(vec &v) {
+float vec::operator*(vec &v) {
     int dim = this->dim();
     ast(dim == v.dim(), "Vector dimensions must be same");
-    double sum = 0;
+    float sum = 0;
 
     for (int i=0; i<dim; i++)
         sum+=coordinates[i]*v.coordinates[i];
@@ -83,8 +82,13 @@ bool vec::operator>=(vec &v) {
     return norm() >= v.norm();
 }
 
+vec2::vec2() : vec(2),
+x(coordinates[0]), y(coordinates[1]) {
+    this->x = 0;
+    this->y = 0;
+}
 
-vec2::vec2(double x, double y) : vec(2),
+vec2::vec2(float x, float y) : vec(2),
 x(coordinates[0]), y(coordinates[1]) {
     this->x = x;
     this->y = y;
@@ -98,8 +102,21 @@ vec2 vec2::operator-(vec2 &v) {
     return vec2(x-v.x,y-v.y);
 }
 
-double vec2::operatorX(vec2 &v) {
+vec2 vec2::operator*(float scalar) {
+    return vec2(scalar*x,scalar*y);
+}
+
+float vec2::operator*(vec2 &v) {
+    vec::operator*(v);
+}
+
+float vec2::operatorX(vec2 &v) {
     return x*v.y - v.x*y;
+}
+
+vec2 vec2::normalize() {
+    float norm = this->norm();
+    return vec2(x/norm, y/norm);
 }
 
 vec3::vec3() : vec(3),
@@ -109,7 +126,7 @@ x(coordinates[0]), y(coordinates[1]), z(coordinates[2]) {
     this->z = 0;
 }
 
-vec3::vec3(double x, double y, double z) : vec(3),
+vec3::vec3(float x, float y, float z) : vec(3),
 x(coordinates[0]), y(coordinates[1]), z(coordinates[2]) {
     this->x = x;
     this->y = y;
@@ -124,6 +141,23 @@ vec3 vec3::operator-(vec3 &v) {
     return vec3(x-v.x,y-v.y,z-v.z);
 }
 
+vec3 vec3::operator*(float scalar) {
+    return vec3(scalar*x,scalar*y,scalar*z);
+}
+
+float vec3::operator*(vec3 &v) {
+    vec::operator*(v);
+}
+
 vec3 vec3::operatorX(vec3 &v) {
     return vec3(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);
+}
+
+float vec3::operatorTriple(vec3 &v, vec3 &u) {
+    return this->operatorX(v).operator*(u);
+}
+
+vec3 vec3::normalize() {
+    float norm = this->norm();
+    return vec3(x/norm, y/norm, z/norm);
 }
