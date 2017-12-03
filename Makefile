@@ -1,11 +1,11 @@
-PROGRAM = senseFX
+PROGRAM = senseFX 
 CXX     = g++
 CFLAGS  = -g -Wall -std=c99 -I/usr/X11R6/include -I/usr/pkg/include
 LDFLAGS = -L/usr/X11R6/lib -L/usr/pkg/lib
 LDLIBS  = -lglut -lGLU -lGL -lGLEW
 
-$(PROGRAM): main.o vec.o 
-	$(CXX) $(LDFLAGS) -o $(PROGRAM) main.o vec.o $(LDLIBS)
+$(PROGRAM): main.o vec.o ast.o
+	$(CXX) $(LDFLAGS) -o $(PROGRAM) main.o vec.o ast.o $(LDLIBS)
 
 .PHONY: clean dist
 
