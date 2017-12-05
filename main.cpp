@@ -1,10 +1,13 @@
 #include <iostream>
+#include <map>
 #include "vec.h"
+#include "config.h"
 
 using namespace std;
 
 int main() {
 
+    /* vector class examples */
     vec3 u(2,8,-2);
     vec3 v(-4,11,-4);
 
@@ -39,6 +42,13 @@ int main() {
 
     vec3 xNorm = x.normalize();
     cout << "Normalized x: " << xNorm << endl;
+
+    /* config class examples */
+    config appCfg("configs/application.cfg");
+    cout << appCfg.getParameter("TITLE") << endl;
+
+    std::map<string, config> confMap = config::importAll("configs");
+    cout << confMap["application"].getParameter("AUTHOR") << endl;
 
     return 0;
 }
