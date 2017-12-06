@@ -47,8 +47,9 @@ int main() {
     config appCfg("configs/application.cfg");
     cout << appCfg.getParameter("TITLE") << endl;
 
-    std::map<string, config> confMap = config::importAll("configs");
+    std::map<string, config> confMap = config::importAll("configs", "DEVELOPMENT");
     cout << confMap["application"].getParameter("AUTHOR") << endl;
+    cout << confMap["application"].getParameter("TITLE") << endl;
 
     return 0;
 }

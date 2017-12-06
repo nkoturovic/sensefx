@@ -11,17 +11,14 @@ config::config(std::string path, std::string mode) : path(path), mode(mode) {
     const std::regex regParam("^([A-Z]+?)\\=(.+?)$");
     std::smatch match;
 
-    int lineNum = 0;
-    for (std::string line; getline(f, line); lineNum++) {
-
-        if (std::regex_search(line, match, regMode)) {
-            if (!(match[1].compare("DEFAULT") || match[1].compare(mode))) {
-                break;
-            }
-        }
+    for (std::string line; getline(f, line);) {
 
         if (std::regex_search(line, match, regParam)) {
             this->parameters[match[1]] = match[2];
+
+        } else if (std::regex_search(line, match, regMode)) {
+            if (!((match[2].compare("DEFAULT") == 0) || (match[2].compare(mode) == 0)))
+                break;
         }
     }
 }

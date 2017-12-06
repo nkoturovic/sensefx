@@ -11,7 +11,7 @@ $(PROGRAM): main.o vec.o ast.o config.o
 .PHONY: clean dist
 
 clean:
-	-rm *.o $(PROGRAM) *core
+	-rm *.o $(PROGRAM)
 
 dist: clean
 	-tar -chvj -C .. -f ../$(PROGRAM).tar.bz2 $(PROGRAM)
