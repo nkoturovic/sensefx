@@ -8,7 +8,7 @@ namespace fs = std::experimental::filesystem;
 config::config(std::string path, std::string mode) : path(path), mode(mode) {
     std::ifstream f(path);
     const std::regex regMode("^(\\[%([A-Z]+?)%\\])$");
-    const std::regex regParam("^([A-Z]+?)\\=(.+?)$");
+    const std::regex regParam("^([A-Z_]+?)\\=(.+?)$");
     std::smatch match;
 
     for (std::string line; getline(f, line);) {

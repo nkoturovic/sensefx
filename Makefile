@@ -1,4 +1,4 @@
-PROGRAM = senseFX 
+PROGRAM = senseFX.out
 CXX     = g++
 CXXFLAGS = -std=c++17
 LDFLAGS = -L/usr/X11R6/lib -L/usr/pkg/lib

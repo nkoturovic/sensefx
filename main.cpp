@@ -1,55 +1,68 @@
 #include <iostream>
 #include <map>
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
+
 #include "vec.h"
 #include "config.h"
 
 using namespace std;
 
-int main() {
 
-    /* vector class examples */
-    vec3 u(2,8,-2);
-    vec3 v(-4,11,-4);
+static void on_display() {
 
-    cout << "Norme u i v: " << u.norm() << " " << v.norm() << endl;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(1, 1, 1, 1); // Klasa color potrebna
 
-    if (u <= v)
-        cout << "u <= v" << endl;
+	glutSwapBuffers();
+}
 
-    if (u >= v)
-        cout << "u >= u" << endl;
+static void on_reshape(int width, int height) {
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(60, (float) width/(float) height, 0.1, 1500);
+}
 
-    vec3 w = u + v;
-    cout << "u + v is:" << w << endl;
+static void on_keyboard(unsigned char c, int x, int y) {
+}
 
-    vec3 w1 = u - v;
-    cout << "u - v is:" << w1 << endl;
+static void on_mouse(int button, int state, int x, int y) {
+}
 
-    double dotProduct = u * v;
-    cout << "Dot product is: " << dotProduct << endl;
+static void on_timer(int value) {
+	if (value != 0)
+		return;
+	glutPostRedisplay();
+	glutTimerFunc(10, on_timer, 0);
+}
 
-    vec3 vecProduct = u.operatorX(v);
-    cout << "Cross product: " << vecProduct << endl;
+int main(int argc, char * argv[]) {
 
-    vec2 u2 = vec2(2, 2);
-    vec2 v2 = vec2(-3, 4);
+	std::map<string, config> confMap = config::importAll("configs", "DEVELOPMENT");
+	config appConfig = confMap["application"];
 
-    cout << "Cross of 2-dim vecs u2 and v2 is: " << u2.operatorX(v2) << endl;
+	glutInit(&argc, argv);
+	int dflWidth = std::stoi(appConfig.getParameter("WIN_WIDTH"));
+	int dflHeight = std::stoi(appConfig.getParameter("WIN_HEIGHT"));
 
-    vec3 x(2,-3,1);
+	glutInitWindowSize(dflWidth, dflHeight);
+	glutInitWindowPosition(0, 0);
 
-    cout << "Triple product: " << v.operatorTriple(u,x) << endl;
+	const char * title = appConfig.getParameter("TITLE").c_str();
+	glutCreateWindow(title);
 
-    vec3 xNorm = x.normalize();
-    cout << "Normalized x: " << xNorm << endl;
+	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+	glEnable(GL_DEPTH_TEST);
+	glutDisplayFunc(on_display);
+	glutReshapeFunc(on_reshape);
+	glutKeyboardFunc(on_keyboard);
+	glutTimerFunc(10, on_timer, 0);
 
-    /* config class examples */
-    config appCfg("configs/application.cfg");
-    cout << appCfg.getParameter("TITLE") << endl;
 
-    std::map<string, config> confMap = config::importAll("configs", "DEVELOPMENT");
-    cout << confMap["application"].getParameter("AUTHOR") << endl;
-    cout << confMap["application"].getParameter("TITLE") << endl;
+	glutMainLoop();
 
-    return 0;
+	return 0;
 }
