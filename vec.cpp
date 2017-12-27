@@ -6,11 +6,11 @@ vec::vec(int dim) {
     coordinates.resize(dim);
 }
 
-int vec::dim() {
+int vec::dim()const {
         return (int) coordinates.size();
 }
 
-float vec::normSquared() {
+float vec::normSquared() const {
     float sum = 0;
     int dim = this->dim();
 
@@ -20,11 +20,11 @@ float vec::normSquared() {
     return sum;
 }
 
-float vec::norm() {
+float vec::norm() const{
    return std::sqrt(this->normSquared());
 }
 
-float vec::operator*(vec &v) {
+float vec::operator*(vec &v)const{
     int dim = this->dim();
     ast(dim == v.dim(), "Vector dimensions must be same");
     float sum = 0;
@@ -33,6 +33,11 @@ float vec::operator*(vec &v) {
         sum+=coordinates[i]*v.coordinates[i];
 
     return sum;
+}
+
+float vec::angle(vec v) {
+	float scalarProduct = (*this)*v;
+	return scalarProduct/(this->norm()*v.norm());
 }
 
 std::ostream &operator<<(std::ostream &os,vec &v) {
@@ -107,7 +112,7 @@ vec2 vec2::operator*(float scalar) {
 }
 
 float vec2::operator*(vec2 &v) {
-    vec::operator*(v);
+    return vec::operator*(v);
 }
 
 float vec2::operatorX(vec2 &v) {
@@ -133,20 +138,30 @@ x(coordinates[0]), y(coordinates[1]), z(coordinates[2]) {
     this->z = z;
 }
 
-vec3 vec3::operator+(vec3 &v) {
+vec3::vec3(float *v) : vec3(v[0], v[1], v[2]) {}
+
+vec3 vec3::operator+(const vec3 &v) const{
     return vec3(x+v.x,y+v.y,z+v.z);
 }
 
-vec3 vec3::operator-(vec3 &v) {
+vec3 vec3::operator+=(const vec3 &v) const{
+	vec3 sum = *this + v;
+	this->x = sum.x;
+	this->y = sum.y;
+	this->z = sum.z;
+	return *this;
+}
+
+vec3 vec3::operator-(vec3 &v) const{
     return vec3(x-v.x,y-v.y,z-v.z);
 }
 
-vec3 vec3::operator*(float scalar) {
+vec3 vec3::operator*(float scalar)const {
     return vec3(scalar*x,scalar*y,scalar*z);
 }
 
-float vec3::operator*(vec3 &v) {
-    vec::operator*(v);
+float vec3::operator*(vec3 &v)const {
+    return vec::operator*(v);
 }
 
 vec3 vec3::operatorX(vec3 &v) {
@@ -157,7 +172,14 @@ float vec3::operatorTriple(vec3 &v, vec3 &u) {
     return this->operatorX(v).operator*(u);
 }
 
-vec3 vec3::normalize() {
+vec3 vec3::normalize() const {
     float norm = this->norm();
     return vec3(x/norm, y/norm, z/norm);
+}
+
+void vec3::normalizeSelf() const {
+	vec3 normV = this->normalize();
+	this->x = normV.x;
+	this->y = normV.y;
+	this->z = normV.z;
 }

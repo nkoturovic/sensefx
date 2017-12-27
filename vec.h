@@ -12,16 +12,17 @@ class vec {
     public:
         vec(int dim);
 
-        int dim();
+        int dim()const;
 
-        float normSquared();
-        float norm();
+        float normSquared() const;
+        float norm()const;
+	float angle(vec v);
 
         /* Skalarni proizvod
          * smatra da su "bazni"
          * vektori ortonormirani
          * kao i ostali metodi. */
-        float operator*(vec &v);
+        float operator*(vec &v)const;
 
         bool operator==(vec &v);
 
@@ -62,15 +63,18 @@ class vec3 : public vec {
 
         vec3();
         vec3(float x, float y, float z);
+        vec3(float *);
 
-        vec3 operator+(vec3 &v);
-        vec3 operator-(vec3 &v);
-        vec3 operator*(float scalar);
-        float operator*(vec3 &v);
+        vec3 operator+(const vec3 &v)const;
+	vec3 operator+=(const vec3 &v)const;
+        vec3 operator-(vec3 &v)const;
+        vec3 operator*(float scalar)const;
+        float operator*(vec3 &v)const;
         vec3 operatorX(vec3 &v);
         float operatorTriple(vec3 &v, vec3 &u);
 
-        vec3 normalize();
+        vec3 normalize() const;
+	void normalizeSelf() const;
 };
 
 #endif //SENSEFX_VEC_H
