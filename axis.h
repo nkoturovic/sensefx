@@ -1,7 +1,6 @@
 #ifndef SENSEFX_AXIS_H
 #define SENSEFX_AXIS_H
 
-#include "vec.h"
 #include "object.h"
 
 class axis : public object {

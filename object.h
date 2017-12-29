@@ -2,8 +2,8 @@
 #define SENSEFX_OBJECT_H
 
 #include <vector>
-#include "vec.h"
-#include "mat.h"
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 #include "keyboard.h"
 
 class object {
@@ -11,9 +11,9 @@ class object {
 	public:
 		keyboard keybindings;
 
-		mat4 matrix;
-		void translate(vec3 translateVec);
-		void rotate(float degrees, vec3 aroundVec);
+		glm::mat4 matrix;
+		void translate(glm::vec3 translateVec);
+		void rotate(float degrees, glm::vec3 aroundVec);
 		float speed = 0.1;
 
 		std::vector <object*> children;

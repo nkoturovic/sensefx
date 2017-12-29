@@ -6,10 +6,11 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "dataContainer.h"
 #include "config.h"
-#include "vec.h"
-#include "mat.h"
 #include "object.h"
 #include "camera.h"
 #include "axis.h"
@@ -36,10 +37,10 @@ static void on_display()
 	glLoadIdentity();
 
 	/* Postavljanje tacke gledista */
-	mat4 tmp = globalData.activeCamera->matrix*globalData.cameraRelativeTo->matrix;
-	mat4 view = tmp.inverse();
+	glm::mat4 tmp = globalData.cameraRelativeTo->matrix*globalData.activeCamera->matrix;
+	glm::mat4 view = glm::inverse(tmp);
 
-	glLoadMatrixf(view.elements);
+	glLoadMatrixf(glm::value_ptr(view));
 	//gluLookAt(2, 3, 5, 0, 0, 0, 0, 1, 0);
 
 	/* Iscrtavanje objekata */
@@ -60,6 +61,12 @@ static void on_reshape(int width, int height) {
 
 static void on_keyboard(unsigned char c, int x, int y) 
 {
+	/* U switch-u se obradjuju komande koje ne uticu na 
+	 * pojedinacne objekte vec na ceo program */
+	switch (c) {
+		case 27: exit(EXIT_SUCCESS);
+	}
+
 	globalData.pressedKeys[c] = true; 
 	globalData.keyPressedPositionX = x;
 	globalData.keyPressedPositionY = y;
@@ -80,7 +87,7 @@ static void on_timer(int value)
 	if (value != 0)
 		return;
 	glutPostRedisplay();
-	glutTimerFunc(10, on_timer, 0);
+	glutTimerFunc(20, on_timer, 0);
 }
 
 int main(int argc, char * argv[]) 
@@ -118,8 +125,8 @@ int main(int argc, char * argv[])
 
 	camera cam3rdPerson;
 	axis cameracs(5);
-	cam3rdPerson.translate(vec3(0,2,2));
-	cam3rdPerson.rotate(-30, vec3(1,0,0));
+	cam3rdPerson.translate(glm::vec3(0,2,2));
+	cam3rdPerson.rotate(-30.0f, glm::vec3(1,0,0));
 	cam3rdPerson.addChild(&cameracs);
 	globalData.activeCamera = &cam3rdPerson;
 	globalData.cameraRelativeTo = &objectcs;

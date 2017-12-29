@@ -12,6 +12,11 @@ class keyboard {
 		unsigned char moveLeftKey;
 		unsigned char moveRightKey;
 
+		unsigned char rotateUpKey;
+		unsigned char rotateDownKey;
+		unsigned char rotateLeftKey;
+		unsigned char rotateRightKey;
+
 		keyboard(config keyBindings);
 		keyboard();
 };

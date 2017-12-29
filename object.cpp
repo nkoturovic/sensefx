@@ -1,11 +1,16 @@
 #include "object.h"
-#include "vec.h"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <algorithm>
 #include <iostream>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 object::object(object * parent) {
 	if (parent != NULL)
@@ -20,7 +25,7 @@ void object::addChild(object * o) {
 }
 
 void object::draw() {
-	glMultMatrixf(matrix.elements);
+	glMultMatrixf(glm::value_ptr(matrix));
 	drawObject();
 	drawChildren();
 }
@@ -31,60 +36,59 @@ void object::drawChildren() {
 	});
 }
 
-void object::rotate(float degrees, vec3 aroundVec) {
-	glPushMatrix();
-	glLoadMatrixf(matrix.elements);
-	glRotatef(degrees, aroundVec.x, aroundVec.y, aroundVec.z);
-	glGetFloatv(GL_MODELVIEW_MATRIX, matrix.elements);
-	glPopMatrix();
+void object::rotate(float degrees, glm::vec3 aroundVec) {
+	matrix = glm::rotate(matrix, glm::radians(degrees), aroundVec);
 } 
 
-void object::translate(vec3 translateVec) {
-	glPushMatrix();
-	glLoadMatrixf(matrix.elements);
-	glTranslatef(translateVec.x, translateVec.y, translateVec.z);
-
-	/* Parce koda ispod proverava da li je neka od vrednosti NAN,
-	 * tacnije u poslednjem redu matrice jer je imao bug kada se
-	 * pritisne vise tastera odjednom */
-	mat4 temp;
-	glGetFloatv(GL_MODELVIEW_MATRIX, temp.elements);
-
-	// Da li nije NAN?
-	if (!(temp.matrix[3][0] != temp.matrix[3][0]))
-		matrix = temp;
-
-	glPopMatrix();
+void object::translate(glm::vec3 translateVec) {
+	matrix = glm::translate(matrix, translateVec);
 }
 
 void object::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
-	vec3 moveDirection(0,0,0);
-
-	bool shouldMove = false;
-
 	/* Kretanje napred,nazad,levo,desno (komb.) */
-	if (pressedKeys[keybindings.moveForwardKey]) {
-		moveDirection+=vec3(0,0,-1);
-		shouldMove = true;
-	}
-	if (pressedKeys[keybindings.moveBackKey]) {
-		moveDirection+=vec3(0,0,1);
-		shouldMove = true;
-	}
-	if (pressedKeys[keybindings.moveLeftKey]) {
-		moveDirection+=vec3(-1,0,0);
-		shouldMove = true;
-	}
-	if (pressedKeys[keybindings.moveRightKey]) {
-		moveDirection+=vec3(1,0,0);
-		shouldMove = true;
-	}
+	
+	float moveForward = 0.0f, moveLeft = 0.0f;
 
-	moveDirection.normalizeSelf();
+	if (pressedKeys[keybindings.moveForwardKey]) 
+		moveForward-=1.0f;
 
-	if (shouldMove) {
-		this->translate(moveDirection*speed);
-	}
+	if (pressedKeys[keybindings.moveBackKey]) 
+		moveForward+=1.0f;
+
+	if (pressedKeys[keybindings.moveLeftKey]) 
+		moveLeft-=1.0f;
+
+	if (pressedKeys[keybindings.moveRightKey]) 
+		moveLeft+=1.0f;
+
+	if (moveLeft || moveForward)
+		this->translate(glm::vec3(moveLeft*speed, 0, moveForward*speed));
+
+
+
+	/* Rotitanje objekta ijkl */
+
+	float rotateUp = 0.0f, rotateLeft=0.0f;
+	
+	if (pressedKeys[keybindings.rotateUpKey])
+		rotateUp += 1.0f;
+
+	if (pressedKeys[keybindings.rotateDownKey]) 
+		rotateUp -= 1.0f;
+
+	if (pressedKeys[keybindings.rotateLeftKey])
+		rotateLeft += 1.0f;
+
+	if (pressedKeys[keybindings.rotateRightKey])
+		rotateLeft -= 1.0f;
+	
+
+	if (rotateUp)
+		this->rotate(rotateUp, glm::vec3(1,0,0));
+
+	if (rotateLeft)
+		this->rotate(rotateLeft, glm::vec3(0,1,0));
+
 }
 

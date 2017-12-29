@@ -13,4 +13,10 @@ keyboard::keyboard() {
 	moveBackKey = 's';
 	moveLeftKey = 'a';
 	moveRightKey = 'd';
+
+	rotateUpKey = 'k'; 
+	rotateDownKey = 'j';
+	rotateLeftKey = 'h';
+	rotateRightKey = 'l';
+
 };
