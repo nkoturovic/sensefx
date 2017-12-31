@@ -20,6 +20,7 @@ class object {
 		glm::mat4 matrix;
 		void translate(glm::vec3 translateVec);
 		void rotate(float degrees, glm::vec3 aroundVec);
+		void scale(glm::vec3 scaleVec);
 		
 		std::vector <object*> children;
 		object * parent = NULL;

@@ -17,7 +17,8 @@
 #include "object.h"
 #include "user.h"
 #include "camera.h"
-#include "axis.h"
+#include "math_objects.h"
+#include "various_objects.h"
 
 using namespace std;
 
@@ -141,7 +142,18 @@ int main(int argc, char * argv[])
 	glutCreateWindow(title);
 
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+
+	/* Anti-Aliasing */
+	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_POLYGON_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
+	/* Normalize normals */
+	glEnable(GL_NORMALIZE);
+
 	glutDisplayFunc(on_display);
 	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(on_keyboard);
@@ -158,13 +170,19 @@ int main(int argc, char * argv[])
 	std::vector<object* > &objectsToKeyboard = globalData.toKeyboard;
 	std::vector<object* > &objectsToMouseMove = globalData.toMouseMove;
 
-	axis wcs(5);
-	objectsToDisplay.push_back(&wcs);
+	axis cs(5);
+	objectsToDisplay.push_back(&cs);
+
+	chessFloor floor1(12*4);
+	floor1.scale(glm::vec3(4.0f,1.0f,4.0f));
+	floor1.translate(glm::vec3(0.0f,-0.13f,0.0f));
+	objectsToDisplay.push_back(&floor1);
 
 	axis random(5);
 	random.translate(glm::vec3(1,1,1));
 
 	user sampleUser;
+	sampleUser.addChild(&cs);
 	objectsToDisplay.push_back(&sampleUser);
 	globalData.activeCamera = sampleUser.fpsViewCamera();
 

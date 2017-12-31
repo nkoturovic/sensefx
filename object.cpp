@@ -47,6 +47,10 @@ void object::translate(glm::vec3 translateVec) {
 	matrix = glm::translate(matrix, translateVec);
 }
 
+void object::scale(glm::vec3 scaleVec) {
+	matrix = glm::scale(matrix, scaleVec);
+}
+
 glm::mat4 object::transformationMatrix() {
 	object * tmp_ptr = this;
 	glm::mat4 result_matrix(1.0f);

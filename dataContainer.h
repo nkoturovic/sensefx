@@ -30,13 +30,13 @@ class dataContainer {
 		int keyReleasedPositionY;
 
 		const int redisplayTimerId = 0;
-		float redisplayTimerInterval = 10;
+		float redisplayTimerInterval = 20;
 
 		const int mouseTimerId = 1;
-		float mouseTimerInterval = 10;
+		float mouseTimerInterval = 20;
 
 		const int keyboardTimerId = 2;
-		float keyboardTimerInterval = 10;
+		float keyboardTimerInterval = 20;
 
 		glm::vec2 mousePosition;
 };
