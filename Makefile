@@ -5,8 +5,8 @@ LDFLAGS = -L/usr/X11R6/lib -L/usr/pkg/lib -g
 LDLIBS  = -lglut -lGLU -lGL -lGLEW -lstdc++fs 
 WFLAGS = -Wall -Wextra
 
-$(PROGRAM): main.o ast.o config.o object.o keyboard.o user.o camera.o axis.o
-	$(CXX) $(LDFLAGS) -o $(PROGRAM) main.o ast.o config.o object.o keyboard.o user.o camera.o axis.o $(LDLIBS) $(WFLAGS)
+$(PROGRAM): main.o ast.o config.o object.o keyboard.o mouse.o user.o camera.o axis.o
+	$(CXX) $(LDFLAGS) -o $(PROGRAM) main.o ast.o config.o object.o keyboard.o mouse.o user.o camera.o axis.o $(LDLIBS) $(WFLAGS)
 
 .PHONY: clean dist
 

@@ -5,10 +5,13 @@
 #include "camera.h"
 
 class head : public object {
+	private:
+		float headRotated=0.0f;
 	public:
 		head();
 		camera firstPerson;
 		void processKeyboardInput(bool pressedKeys[256], int x, int y);
+		void processMouseMove(glm::vec2 delta);
 
 		void drawObject();
 };
@@ -16,6 +19,7 @@ class head : public object {
 class body : public object {
 	public:
 		void drawObject();
+		void processMouseMove(glm::vec2 delta);
 };
 
 
@@ -31,6 +35,7 @@ class user : public object {
 
 		void drawObject();
 		void processKeyboardInput(bool pressedKeys[256], int x, int y);
+		void processMouseMove(glm::vec2 delta);
 		camera * fpsViewCamera();
 };
 

@@ -19,6 +19,7 @@ class dataContainer {
 
 		std::vector <object*> toDisplay;
 		std::vector <object*> toKeyboard; 
+		std::vector <object*> toMouseMove;
 
 		camera * activeCamera;
 
@@ -27,6 +28,17 @@ class dataContainer {
 		int keyPressedPositionY;
 		int keyReleasedPositionX;
 		int keyReleasedPositionY;
+
+		const int redisplayTimerId = 0;
+		float redisplayTimerInterval = 10;
+
+		const int mouseTimerId = 1;
+		float mouseTimerInterval = 10;
+
+		const int keyboardTimerId = 2;
+		float keyboardTimerInterval = 10;
+
+		glm::vec2 mousePosition;
 };
 
 #endif //SENSEFX_CONTAINER_H

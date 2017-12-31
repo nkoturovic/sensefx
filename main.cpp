@@ -6,7 +6,10 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
+/* GL MATH Biblioteka */
 #include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "dataContainer.h"
@@ -27,12 +30,6 @@ static void on_display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.75, 0.75, 0.75, 1); // Klasa color potrebna (mozda i ne)
-
-	/* TODO: Obradjivanje zahteva tastature, ne bi trebalo ovde da stoje verovatno!!! */
-	std::vector<object* > &objectsToKeyboard = globalData.toKeyboard;
-	for_each (objectsToKeyboard.begin(), objectsToKeyboard.end(), [] (object * o) {
-		o->processKeyboardInput(globalData.pressedKeys, globalData.keyPressedPositionX, globalData.keyPressedPositionY);
-	});
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -77,15 +74,55 @@ static void on_keyboard_release(unsigned char c, int x, int y)
 	globalData.keyReleasedPositionY = y;
 }
 
-static void on_mouse(int button, int state, int x, int y) {
+static void on_mouse_move(int x, int y) {
+	globalData.mousePosition = glm::vec2(x,y);
 }
 
-static void on_timer(int value) 
-{
-	if (value != 0)
+static void mouse_timer(int value) {
+
+	if (value != globalData.mouseTimerId)
 		return;
+
+	GLint m_viewport[4];
+	glGetIntegerv( GL_VIEWPORT, m_viewport );
+
+	glm::vec2 center(m_viewport[2]/2, m_viewport[3]/2);
+	glm::vec2 mousePosition = globalData.mousePosition;
+
+	glm::vec2 delta = center-mousePosition;
+
+	std::vector<object* > &objectsToMouseMove = globalData.toMouseMove;
+	for_each (objectsToMouseMove.begin(), objectsToMouseMove.end(), [delta] (object * o) {
+		o->processMouseMove(delta);
+	});
+
+	glutWarpPointer( center.x , center.y );
+
+	glutTimerFunc(globalData.mouseTimerInterval, mouse_timer, globalData.mouseTimerId);
+}
+
+static void keyboard_timer(int value) {
+
+	if (value != globalData.keyboardTimerId)
+		return;
+
+	/* TODO: Obradjivanje zahteva tastature, ne bi trebalo ovde da stoje verovatno!!! */
+	std::vector<object* > &objectsToKeyboard = globalData.toKeyboard;
+	for_each (objectsToKeyboard.begin(), objectsToKeyboard.end(), [] (object * o) {
+		o->processKeyboardInput(globalData.pressedKeys, globalData.keyPressedPositionX, globalData.keyPressedPositionY);
+	});
+
+	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
+
+}
+
+static void redisplay_timer(int value) 
+{
+	if (value != globalData.redisplayTimerId)
+		return;
+
 	glutPostRedisplay();
-	glutTimerFunc(20, on_timer, 0);
+	glutTimerFunc(globalData.redisplayTimerInterval, redisplay_timer, globalData.redisplayTimerId);
 }
 
 int main(int argc, char * argv[]) 
@@ -109,12 +146,17 @@ int main(int argc, char * argv[])
 	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(on_keyboard);
 	glutKeyboardUpFunc(on_keyboard_release);
-	glutTimerFunc(10, on_timer, 0);
+	glutPassiveMotionFunc(on_mouse_move);
+	glutSetCursor(GLUT_CURSOR_NONE);
+	glutTimerFunc(globalData.redisplayTimerInterval, redisplay_timer, globalData.redisplayTimerId);
+	glutTimerFunc(globalData.mouseTimerInterval, mouse_timer, globalData.mouseTimerId);
+	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
 
 	/* Ispod je primer dat zbog testing-a */
 	
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
 	std::vector<object* > &objectsToKeyboard = globalData.toKeyboard;
+	std::vector<object* > &objectsToMouseMove = globalData.toMouseMove;
 
 	axis wcs(5);
 	objectsToDisplay.push_back(&wcs);
@@ -130,6 +172,7 @@ int main(int argc, char * argv[])
 
 	objectsToDisplay.push_back(&random);
 	objectsToKeyboard.push_back(&sampleUser);
+	objectsToMouseMove.push_back(&sampleUser);
 
 	glutMainLoop();
 

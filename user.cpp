@@ -12,9 +12,58 @@ head::head() {
 }
 
 void head::processKeyboardInput(bool pressedKeys[256], int x, int y) {
-	/* Rotitanje objekta ijkl */
+
+	/* Data funkcija proverava da li je vertikalna rotacija
+	 * veca od 90 stepeni, ako jeste nece se rotirati dalje
+	 * u suprotnom hoce */
+	float keyRotationSensitivity = keyboardObj.keyRotationSensitivity;
+
+	float oldHeadRotated = headRotated;
+
+	if (pressedKeys[keybindings.rotateUpKey]) {
+
+		headRotated += keyRotationSensitivity;
+
+		if (headRotated > 90.0f) {
+			headRotated = oldHeadRotated;
+			return;
+		}
+	}
+
+	if (pressedKeys[keybindings.rotateDownKey]) {
+
+		headRotated -= keyRotationSensitivity;
+
+		if (headRotated < -90.0f) {
+			headRotated = oldHeadRotated;
+			return;
+		}
+	}
+
 	rotateUpKeys(pressedKeys);
 }
+
+void head::processMouseMove(glm::vec2 delta) {
+
+	float mouseRotationSensitivity = this->mouseObj.sensitivity;
+
+	float oldHeadRotated = headRotated;
+	headRotated += delta.y * mouseRotationSensitivity;
+
+	if (headRotated > 90.0f) {
+		headRotated = oldHeadRotated;
+		return;
+	}
+
+	if (headRotated < -90.0f) {
+		headRotated = oldHeadRotated;
+		return;
+	}
+
+	rotateMouse(glm::vec2(0.0f,delta.y));
+}
+
+void body::processMouseMove(glm::vec2 delta) { };
 
 void user::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
@@ -22,6 +71,11 @@ void user::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 	rotateLeftKeys(pressedKeys);
 
 	this->userHead.processKeyboardInput(pressedKeys, x, y);
+}
+
+void user::processMouseMove(glm::vec2 delta) {
+	rotateMouse(glm::vec2(delta.x,0.0f));
+	this->userHead.processMouseMove(glm::vec2(0.0f, delta.y));
 }
 
 void head::drawObject(){

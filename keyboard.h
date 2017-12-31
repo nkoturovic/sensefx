@@ -5,7 +5,11 @@
 
 class keyboard {
 
+	private:
+		void init(config keyBindings); 
+
 	public:
+		float keyRotationSensitivity;
 
 		unsigned char moveForwardKey;
 		unsigned char moveBackKey;

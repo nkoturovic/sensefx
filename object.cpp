@@ -74,48 +74,11 @@ void object::setParent(object * parent) {
 void object::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
 	/* Kretanje napred,nazad,levo,desno (komb.) */
-	
-	float moveForward = 0.0f, moveLeft = 0.0f;
-
-	if (pressedKeys[keybindings.moveForwardKey]) 
-		moveForward-=1.0f;
-
-	if (pressedKeys[keybindings.moveBackKey]) 
-		moveForward+=1.0f;
-
-	if (pressedKeys[keybindings.moveLeftKey]) 
-		moveLeft-=1.0f;
-
-	if (pressedKeys[keybindings.moveRightKey]) 
-		moveLeft+=1.0f;
-
-	if (moveLeft || moveForward)
-		this->translate(glm::vec3(moveLeft*speed, 0, moveForward*speed));
-
-
+	moveKeys(pressedKeys);
 
 	/* Rotitanje objekta ijkl */
-
-	float rotateUp = 0.0f, rotateLeft=0.0f;
-	
-	if (pressedKeys[keybindings.rotateUpKey])
-		rotateUp += 1.0f;
-
-	if (pressedKeys[keybindings.rotateDownKey]) 
-		rotateUp -= 1.0f;
-
-	if (pressedKeys[keybindings.rotateLeftKey])
-		rotateLeft += 1.0f;
-
-	if (pressedKeys[keybindings.rotateRightKey])
-		rotateLeft -= 1.0f;
-	
-
-	if (rotateUp)
-		this->rotate(rotateUp, glm::vec3(1,0,0));
-
-	if (rotateLeft)
-		this->rotate(rotateLeft, glm::vec3(0,1,0));
+	rotateUpKeys(pressedKeys);
+	rotateLeftKeys(pressedKeys);
 
 }
 
@@ -143,28 +106,42 @@ void object::moveKeys(bool pressedKeys[256]) {
 }
 
 void object::rotateUpKeys(bool pressedKeys[256]) {
+
+	float keyRotationSensitivity = keyboardObj.keyRotationSensitivity;
+
 	float rotateUp = 0.0f;
 	
 	if (pressedKeys[keybindings.rotateUpKey])
-		rotateUp += 1.0f;
+		rotateUp += keyRotationSensitivity;
 
 	if (pressedKeys[keybindings.rotateDownKey]) 
-		rotateUp -= 1.0f;
+		rotateUp -= keyRotationSensitivity;
 	
 	if (rotateUp)
-		this->rotate(rotateUp*keyRotationSpeed, glm::vec3(1,0,0));
+		this->rotate(rotateUp, glm::vec3(1,0,0));
 }
 
 void object::rotateLeftKeys(bool pressedKeys[256]) {
+
 	float rotateLeft=0.0f;
+	float keyRotationSensitivity = keyboardObj.keyRotationSensitivity;
 
 	if (pressedKeys[keybindings.rotateLeftKey])
-		rotateLeft += 1.0f;
+		rotateLeft += keyRotationSensitivity;
 
 	if (pressedKeys[keybindings.rotateRightKey])
-		rotateLeft -= 1.0f;
+		rotateLeft -= keyRotationSensitivity;
 
 	if (rotateLeft)
-		this->rotate(rotateLeft*keyRotationSpeed, glm::vec3(0,1,0));
+		this->rotate(rotateLeft, glm::vec3(0,1,0));
 }
 
+void object::processMouseMove(glm::vec2 delta) {
+	rotateMouse(delta); 
+}
+
+void object::rotateMouse(glm::vec2 delta) {
+	float mouseRotationSensitivity = mouseObj.sensitivity;
+	this->rotate(delta.x*mouseRotationSensitivity, glm::vec3(0,1,0));
+	this->rotate(delta.y*mouseRotationSensitivity, glm::vec3(1,0,0));
+}

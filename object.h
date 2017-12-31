@@ -5,15 +5,17 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include "keyboard.h"
+#include "mouse.h"
 
 class object {
 
 	protected:
 		float speed = 0.01;
-		float keyRotationSpeed = 2;
 
 	public:
-		keyboard keybindings;
+		keyboard keyboardObj;
+		keyboard &keybindings = keyboardObj; 
+		mouse mouseObj;
 
 		glm::mat4 matrix;
 		void translate(glm::vec3 translateVec);
@@ -34,6 +36,9 @@ class object {
 		void moveKeys(bool pressedKeys[256]);
 		void rotateLeftKeys(bool pressedKeys[256]);
 		void rotateUpKeys(bool pressedKeys[256]);
+
+		void virtual processMouseMove(glm::vec2 delta);
+		void rotateMouse(glm::vec2 delta);
 
 		void setParent(object * parent);
 		void setNoParent();
