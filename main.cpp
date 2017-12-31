@@ -12,6 +12,7 @@
 #include "dataContainer.h"
 #include "config.h"
 #include "object.h"
+#include "user.h"
 #include "camera.h"
 #include "axis.h"
 
@@ -37,11 +38,8 @@ static void on_display()
 	glLoadIdentity();
 
 	/* Postavljanje tacke gledista */
-	glm::mat4 tmp = globalData.cameraRelativeTo->matrix*globalData.activeCamera->matrix;
-	glm::mat4 view = glm::inverse(tmp);
-
-	glLoadMatrixf(glm::value_ptr(view));
-	//gluLookAt(2, 3, 5, 0, 0, 0, 0, 1, 0);
+	glLoadMatrixf(glm::value_ptr(globalData.activeCamera->viewMatrix()));
+	//gluLookAt(3, 4, 5, 0, 0, 0, 0, 1, 0);
 
 	/* Iscrtavanje objekata */
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
@@ -121,19 +119,17 @@ int main(int argc, char * argv[])
 	axis wcs(5);
 	objectsToDisplay.push_back(&wcs);
 
-	axis objectcs(5);
+	axis random(5);
+	random.translate(glm::vec3(1,1,1));
 
-	camera cam3rdPerson;
+	user sampleUser;
+	objectsToDisplay.push_back(&sampleUser);
+	globalData.activeCamera = sampleUser.fpsViewCamera();
+
 	axis cameracs(5);
-	cam3rdPerson.translate(glm::vec3(0,2,2));
-	cam3rdPerson.rotate(-30.0f, glm::vec3(1,0,0));
-	cam3rdPerson.addChild(&cameracs);
-	globalData.activeCamera = &cam3rdPerson;
-	globalData.cameraRelativeTo = &objectcs;
 
-	objectsToDisplay.push_back(&objectcs);
-	objectsToDisplay.push_back(&cam3rdPerson);
-	objectsToKeyboard.push_back(&objectcs);
+	objectsToDisplay.push_back(&random);
+	objectsToKeyboard.push_back(&sampleUser);
 
 	glutMainLoop();
 

@@ -21,7 +21,6 @@ class dataContainer {
 		std::vector <object*> toKeyboard; 
 
 		camera * activeCamera;
-		object * cameraRelativeTo; 
 
 		bool pressedKeys[256];
 		int keyPressedPositionX;
