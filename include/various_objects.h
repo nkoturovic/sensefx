@@ -17,5 +17,19 @@ class chessFloor : public object {
 		void drawChessSingleTexture();
 };
 
+class triangleFloor : public object {
+
+	public:
+		int numOfUnits=8;
+
+		triangleFloor(object * parent, int numOfUnits);
+		triangleFloor(object * parent);
+		triangleFloor(int numOfUnits);
+		triangleFloor();
+
+		void drawObject();
+		void drawtriangleSingleTexture();
+};
+
 
 #endif // SENSEFX_VARIOUS_OBJECTS_H

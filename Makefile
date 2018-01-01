@@ -1,17 +1,24 @@
 PROGRAM = senseFX.out
 CXX     = g++
-CXXFLAGS = -std=c++17
-LDFLAGS = -L/usr/X11R6/lib -L/usr/pkg/lib -g
-LDLIBS  = -lglut -lGLU -lGL -lGLEW -lstdc++fs 
+CXXFLAGS = -std=c++17 -I include
+LDLIBS  = -lglut -lGLU -lGL -lstdc++fs 
 WFLAGS = -Wall -Wextra
+SRC_DIR = src
+OBJ_DIR = $(SRC_DIR)/obj
+SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
+OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
-$(PROGRAM): main.o ast.o config.o object.o keyboard.o mouse.o user.o camera.o math_objects.o various_objects.o
-	$(CXX) $(LDFLAGS) -o $(PROGRAM) main.o ast.o config.o object.o keyboard.o mouse.o user.o camera.o math_objects.o various_objects.o $(LDLIBS) $(WFLAGS)
+$(PROGRAM): $(OBJ_FILES)
+	$(CXX) -o $(PROGRAM) $(OBJ_FILES) $(LDLIBS) $(WFLAGS)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $< $(LDLIBS) $(WFLAGS)
+	
 
 .PHONY: clean dist
 
 clean:
-	-rm *.o $(PROGRAM)
+	-rm $(OBJ_DIR)/*.o $(PROGRAM)
 
 dist: clean
 	-tar -chvj -C .. -f ../$(PROGRAM).tar.bz2 $(PROGRAM)

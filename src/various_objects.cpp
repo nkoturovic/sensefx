@@ -83,4 +83,59 @@ void chessFloor::drawChessSingleTexture() {
 		glPopMatrix();
 }
 
+triangleFloor::triangleFloor(object * parent, int numOfUnits) : object(parent), numOfUnits(numOfUnits) { }
+triangleFloor::triangleFloor(object * parent) : triangleFloor(parent, 10){ }
+triangleFloor::triangleFloor(int numOfUnits) : triangleFloor(NULL, numOfUnits) { }
+triangleFloor::triangleFloor() : triangleFloor(NULL, 10){ }
+
+void triangleFloor::drawObject() {
+	float coef = 1.0f/numOfUnits;
+	glTranslatef(-coef,0,-coef);
+	glTranslatef(-1,0,-1);
+	glScalef(coef,1.0f,coef);
+
+	for (int i=0; i<numOfUnits; i++) {
+		glTranslatef(2.0f,0.0f,0.0f);
+		glPushMatrix();
+		for (int j=0; j<numOfUnits; j++) {
+			glTranslatef(0.0f,0.0f,2.0f);
+			drawtriangleSingleTexture();
+		}
+		glPopMatrix();
+	}
+}
+
+void triangleFloor::drawtriangleSingleTexture() {
+	glPushMatrix();
+
+		glTranslatef(0.0,-0.001,0.0);
+		glColor3f(0.9,0.9,0.9);
+		glBegin(GL_QUADS);
+			glVertex3f(-1.0, 0.0,-1.0);
+			glVertex3f(1.0, 0.0, -1.0);
+			glVertex3f(1.0, 0.0, 1.0);
+			glVertex3f(-1.0, 0.0, 1.0);
+
+		glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+		glColor3f(0.1,0.1,0.1);
+		glBegin(GL_TRIANGLES);
+			glVertex3f(-1.0, 0.0,-1.0);
+			glVertex3f(1.0, 0.0,-1.0);
+			glVertex3f(0.0, 0.0, 0.0);
+
+			glVertex3f(1.0, 0.0, 0.0);
+			glVertex3f(1.0, 0.0, 1.0);
+			glVertex3f(0.0, 0.0, 1.0);
+
+			glVertex3f(0.0, 0.0, 1.0);
+			glVertex3f(-1.0, 0.0, 1.0);
+			glVertex3f(-1.0, 0.0, 0.0);
+
+
+		glEnd();
+	glPopMatrix();
+}
 

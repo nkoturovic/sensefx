@@ -30,7 +30,7 @@ dataContainer globalData;
 static void on_display() 
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.75, 0.75, 0.75, 1); // Klasa color potrebna (mozda i ne)
+	glClearColor(0.5, 0.0, 0.0, 1); // Klasa color potrebna (mozda i ne)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -173,7 +173,7 @@ int main(int argc, char * argv[])
 	axis cs(5);
 	objectsToDisplay.push_back(&cs);
 
-	chessFloor floor1(12*4);
+	triangleFloor floor1(12*4);
 	floor1.scale(glm::vec3(4.0f,1.0f,4.0f));
 	floor1.translate(glm::vec3(0.0f,-0.13f,0.0f));
 	objectsToDisplay.push_back(&floor1);
@@ -182,7 +182,6 @@ int main(int argc, char * argv[])
 	random.translate(glm::vec3(1,1,1));
 
 	user sampleUser;
-	sampleUser.addChild(&cs);
 	objectsToDisplay.push_back(&sampleUser);
 	globalData.activeCamera = sampleUser.fpsViewCamera();
 
