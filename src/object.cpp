@@ -149,3 +149,20 @@ void object::rotateMouse(glm::vec2 delta) {
 	this->rotate(delta.x*mouseRotationSensitivity, glm::vec3(0,1,0));
 	this->rotate(delta.y*mouseRotationSensitivity, glm::vec3(1,0,0));
 }
+
+glm::vec3 object::toObject(glm::vec3 world) {
+	glm::mat4 transMat = transformationMatrix();
+	glm::mat4 inverse = glm::inverse(transMat);
+	glm::vec4 worldVec4(world.x, world.y, world.z, 1.0f);
+	glm::vec4 resultVec4 = inverse*worldVec4;
+
+	return glm::vec3(resultVec4.x, resultVec4.y, resultVec4.z);
+}
+
+glm::vec3 object::toWorld(glm::vec3 obj) {
+	glm::vec4 worldVec4(obj.x, obj.y, obj.z, 1.0f);
+	glm::mat4 transMat = transformationMatrix();
+	glm::vec4 resultVec4 = transMat*worldVec4;
+
+	return glm::vec3(resultVec4.x, resultVec4.y, resultVec4.z);
+}

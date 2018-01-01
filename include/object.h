@@ -43,6 +43,11 @@ class object {
 
 		void setParent(object * parent);
 		void setNoParent();
+
+		glm::vec3 toWorld(glm::vec3 obj);
+		glm::vec3 toObject(glm::vec3 world);
+
+
 };
 
 #endif

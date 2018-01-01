@@ -63,8 +63,6 @@ void head::processMouseMove(glm::vec2 delta) {
 	rotateMouse(glm::vec2(0.0f,delta.y));
 }
 
-void body::processMouseMove(glm::vec2 delta) { };
-
 void user::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
 	moveKeys(pressedKeys);
@@ -82,13 +80,8 @@ void head::drawObject(){
 	glColor3f(1,0,0);
 	glutWireCube(0.2);
 }
-void body::drawObject(){
-	glColor3f(0,1,0);
-	glutWireCube(0.8);
-}
 
 user::user(object * parent) : object(parent) {
-	userBody.setParent(this);
 	userHead.setParent(this); 
 }
 
@@ -96,12 +89,8 @@ user::user() : user(NULL) {}
 
 void user::drawObject() {
 
-	glPointSize(5);
-	glColor3f(0,0,1);
-
-	glBegin(GL_POINTS);
-		glVertex3f(0,0,0);
-	glEnd();
+	glColor3f(0,1,0);
+	glutWireCube(1);
 }
 
 camera * user::fpsViewCamera() {

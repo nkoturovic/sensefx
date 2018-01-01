@@ -12,4 +12,3 @@ glm::mat4 camera::viewMatrix() {
 
 	return glm::inverse(this->attachedTo->transformationMatrix() * this->matrix);
 }
-

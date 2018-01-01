@@ -16,19 +16,11 @@ class head : public object {
 		void drawObject();
 };
 
-class body : public object {
-	public:
-		void drawObject();
-		void processMouseMove(glm::vec2 delta);
-};
-
-
 
 class user : public object {
 
 	public:
 		head userHead;
-		body userBody;
 
 		user(object * parent);
 		user();

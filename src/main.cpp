@@ -37,7 +37,7 @@ static void on_display()
 
 	/* Postavljanje tacke gledista */
 	glLoadMatrixf(glm::value_ptr(globalData.activeCamera->viewMatrix()));
-	//gluLookAt(3, 4, 5, 0, 0, 0, 0, 1, 0);
+	//gluLookAt(-3, 4, -5, 1, 1, 1, 0, 1, 0);
 
 	/* Iscrtavanje objekata */
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
@@ -52,7 +52,7 @@ static void on_reshape(int width, int height) {
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60, (float) width/(float) height, 0.1, 1500);
+	gluPerspective(60, (float) width/(float) height, 0.01, 150);
 }
 
 static void on_keyboard(unsigned char c, int x, int y) 
@@ -190,6 +190,7 @@ int main(int argc, char * argv[])
 	objectsToDisplay.push_back(&random);
 	objectsToKeyboard.push_back(&sampleUser);
 	objectsToMouseMove.push_back(&sampleUser);
+
 
 	glutMainLoop();
 
