@@ -77,20 +77,20 @@ void user::processMouseMove(glm::vec2 delta) {
 }
 
 void head::drawObject(){
-	glColor3f(1,0,0);
-	glutWireCube(0.2);
 }
 
 user::user(object * parent) : object(parent) {
-	userHead.setParent(this); 
+	this->speed = 0.25f;
+
+	scale(userToWorldRatio);
+	userHead.setParent(this);
+	userHead.translate(glm::vec3(0.0f,0.84f,0.0f));
+	userHead.scale(headToBodyRatio);
 }
 
 user::user() : user(NULL) {}
 
 void user::drawObject() {
-
-	glColor3f(0,1,0);
-	glutWireCube(1);
 }
 
 camera * user::fpsViewCamera() {

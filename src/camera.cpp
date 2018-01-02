@@ -3,12 +3,16 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 camera::camera(object * attachTo) : matrix(1.0f), attachedTo(attachTo) {}
 camera::camera() : camera(NULL) {}
 
 glm::mat4 camera::viewMatrix() {
-	if (this->attachedTo == NULL) 
+	if (this->attachedTo == NULL) {
 		return glm::inverse(this->matrix);
+	}
 
-	return glm::inverse(this->attachedTo->transformationMatrix() * this->matrix);
+	return glm::lookAt(attachedTo->toWorld(glm::vec3(0,0,0)), attachedTo->toWorld(glm::vec3(0,0,-1)), glm::vec3(0,1,0));
 }

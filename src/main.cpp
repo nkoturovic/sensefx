@@ -22,12 +22,12 @@
 
 using namespace std;
 
-/* Ovde se nalaze svi podaci koji 
- * se dele izmedju funkcija 
+/* Ovde se nalaze svi podaci koji
+ * se dele izmedju funkcija
  * (umesto globalnih promenljivih) */
 dataContainer globalData;
 
-static void on_display() 
+static void on_display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.5, 0.0, 0.0, 1); // Klasa color potrebna (mozda i ne)
@@ -37,11 +37,15 @@ static void on_display()
 
 	/* Postavljanje tacke gledista */
 	glLoadMatrixf(glm::value_ptr(globalData.activeCamera->viewMatrix()));
-	//gluLookAt(-3, 4, -5, 1, 1, 1, 0, 1, 0);
-
+	//gluLookAt(0.2, 0.2, 0.2, 0, 0.2, 0, 0, 1, 0);
+	
 	/* Iscrtavanje objekata */
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
-	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [] (object * o) {
+
+	if (!(objectsToDisplay[2]->isColiding(objectsToDisplay[1])))
+		objectsToDisplay[2]->translate(glm::vec3(0,-0.05,0));	
+
+	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [objectsToDisplay] (object * o) {
 		o->draw();
 	});
 
@@ -52,25 +56,25 @@ static void on_reshape(int width, int height) {
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60, (float) width/(float) height, 0.01, 150);
+	gluPerspective(60, (float) width/(float) height, 0.01f, 1500.0f);
 }
 
-static void on_keyboard(unsigned char c, int x, int y) 
+static void on_keyboard(unsigned char c, int x, int y)
 {
-	/* U switch-u se obradjuju komande koje ne uticu na 
+	/* U switch-u se obradjuju komande koje ne uticu na
 	 * pojedinacne objekte vec na ceo program */
 	switch (c) {
 		case 27: exit(EXIT_SUCCESS);
 	}
 
-	globalData.pressedKeys[c] = true; 
+	globalData.pressedKeys[c] = true;
 	globalData.keyPressedPositionX = x;
 	globalData.keyPressedPositionY = y;
 }
 
 static void on_keyboard_release(unsigned char c, int x, int y)
 {
-	globalData.pressedKeys[c] = false; 
+	globalData.pressedKeys[c] = false;
 	globalData.keyReleasedPositionX = x;
 	globalData.keyReleasedPositionY = y;
 }
@@ -114,10 +118,9 @@ static void keyboard_timer(int value) {
 	});
 
 	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
-
 }
 
-static void redisplay_timer(int value) 
+static void redisplay_timer(int value)
 {
 	if (value != globalData.redisplayTimerId)
 		return;
@@ -126,7 +129,7 @@ static void redisplay_timer(int value)
 	glutTimerFunc(globalData.redisplayTimerInterval, redisplay_timer, globalData.redisplayTimerId);
 }
 
-int main(int argc, char * argv[]) 
+int main(int argc, char * argv[])
 {
 	globalData.configs = config::importAll("configs", "DEVELOPMENT");
 	config appConfig = globalData.configs["application"];
@@ -142,17 +145,14 @@ int main(int argc, char * argv[])
 	glutCreateWindow(title);
 
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-
-	/* Anti-Aliasing */
-	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_POLYGON_SMOOTH);
-	glEnable(GL_LINE_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-	/* Normalize normals */
-	glEnable(GL_NORMALIZE);
+	/* Odsecanje zadnje strane poligona */
+	//glFrontFace(GL_CW);
+	// glEnable(GL_CULL_FACE);
+
+	///* Normalize normals */
+	//glEnable(GL_NORMALIZE);
 
 	glutDisplayFunc(on_display);
 	glutReshapeFunc(on_reshape);
@@ -165,7 +165,7 @@ int main(int argc, char * argv[])
 	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
 
 	/* Ispod je primer dat zbog testing-a */
-	
+
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
 	std::vector<object* > &objectsToKeyboard = globalData.toKeyboard;
 	std::vector<object* > &objectsToMouseMove = globalData.toMouseMove;
@@ -174,12 +174,9 @@ int main(int argc, char * argv[])
 	objectsToDisplay.push_back(&cs);
 
 	triangleFloor floor1(12*4);
-	floor1.scale(glm::vec3(4.0f,1.0f,4.0f));
-	floor1.translate(glm::vec3(0.0f,-0.13f,0.0f));
+	floor1.translate(glm::vec3(0.0f,-1.13f,0.0f));
+	floor1.scale(glm::vec3(4.0f,0.01f,4.0f));
 	objectsToDisplay.push_back(&floor1);
-
-	axis random(5);
-	random.translate(glm::vec3(1,1,1));
 
 	user sampleUser;
 	objectsToDisplay.push_back(&sampleUser);
@@ -187,10 +184,8 @@ int main(int argc, char * argv[])
 
 	axis cameracs(5);
 
-	objectsToDisplay.push_back(&random);
 	objectsToKeyboard.push_back(&sampleUser);
 	objectsToMouseMove.push_back(&sampleUser);
-
 
 	glutMainLoop();
 

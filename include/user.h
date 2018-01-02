@@ -5,9 +5,12 @@
 #include "camera.h"
 
 class head : public object {
+
 	private:
 		float headRotated=0.0f;
+
 	public:
+
 		head();
 		camera firstPerson;
 		void processKeyboardInput(bool pressedKeys[256], int x, int y);
@@ -18,6 +21,10 @@ class head : public object {
 
 
 class user : public object {
+
+	private:
+		glm::vec3 headToBodyRatio = glm::vec3(0.275f,0.1f,0.275f);
+		glm::vec3 userToWorldRatio = glm::vec3(0.1f, 0.275f, 0.1f);
 
 	public:
 		head userHead;

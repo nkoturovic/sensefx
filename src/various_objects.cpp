@@ -39,8 +39,8 @@ void chessFloor::drawObject() {
 }
 
 void chessFloor::drawChessSingleTexture() {
-	glPushMatrix();
 
+	glPushMatrix();
 		glColor3f(0.1,0.1,0.1);
 		glBegin(GL_QUADS);
 			glVertex3f(-1.0, 0.0,-1.0);
@@ -106,6 +106,7 @@ void triangleFloor::drawObject() {
 }
 
 void triangleFloor::drawtriangleSingleTexture() {
+
 	glPushMatrix();
 
 		glTranslatef(0.0,-0.001,0.0);
@@ -120,6 +121,8 @@ void triangleFloor::drawtriangleSingleTexture() {
 	glPopMatrix();
 
 	glPushMatrix();
+		glTranslatef(0,0.01,0);
+
 		glColor3f(0.1,0.1,0.1);
 		glBegin(GL_TRIANGLES);
 			glVertex3f(-1.0, 0.0,-1.0);

@@ -10,30 +10,40 @@
 class object {
 
 	protected:
-		float speed = 0.01;
+		float speed = 0.1;
 
 	public:
-		keyboard keyboardObj;
-		keyboard &keybindings = keyboardObj; 
-		mouse mouseObj;
-
 		glm::mat4 matrix;
-		void translate(glm::vec3 translateVec);
-		void rotate(float degrees, glm::vec3 aroundVec);
-		void scale(glm::vec3 scaleVec);
-		
+
 		std::vector <object*> children;
 		object * parent = NULL;
 
-		virtual void drawObject()=0;
+		keyboard keyboardObj;
+		keyboard &keybindings = keyboardObj;
+		mouse mouseObj;
+
 		object();
 		object(object * parent);
+
+		virtual void drawObject()=0;
 		void draw();
 		void drawChildren();
+		void drawSurroundingGrid();
 		void addChild(object *o);
-		void virtual processKeyboardInput(bool pressedKeys[256], int x, int y);
-		glm::mat4 transformationMatrix();
+		void setParent(object * parent);
+		void setNoParent();
 
+		void translate(glm::vec3 translateVec);
+		void rotate(float degrees, glm::vec3 aroundVec);
+		void scale(glm::vec3 scaleVec);
+
+		glm::vec3 toWorld(glm::vec3 objVec);
+		glm::vec3 toObject(glm::vec3 worldVec);
+		glm::vec3 toObject(object * fromObj, glm::vec3 fromObjVec);
+		glm::mat4 transformationMatrix(object * obj2);
+		glm::mat4 transformationMatrix();
+	
+		void virtual processKeyboardInput(bool pressedKeys[256], int x, int y);
 		void moveKeys(bool pressedKeys[256]);
 		void rotateLeftKeys(bool pressedKeys[256]);
 		void rotateUpKeys(bool pressedKeys[256]);
@@ -41,12 +51,7 @@ class object {
 		void virtual processMouseMove(glm::vec2 delta);
 		void rotateMouse(glm::vec2 delta);
 
-		void setParent(object * parent);
-		void setNoParent();
-
-		glm::vec3 toWorld(glm::vec3 obj);
-		glm::vec3 toObject(glm::vec3 world);
-
+		bool isColiding(object * obj);
 
 };
 
