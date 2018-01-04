@@ -41,10 +41,7 @@ static void on_display()
 	
 	/* Iscrtavanje objekata */
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
-
-	if (!(objectsToDisplay[2]->isColiding(objectsToDisplay[1])))
-		objectsToDisplay[2]->translate(glm::vec3(0,-0.05,0));	
-
+	objectsToDisplay[2]->move(glm::vec3(0,-0.05,0));
 	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [objectsToDisplay] (object * o) {
 		o->draw();
 	});
@@ -172,13 +169,20 @@ int main(int argc, char * argv[])
 
 	axis cs(5);
 	objectsToDisplay.push_back(&cs);
+	cs.translate(glm::vec3(2,1,2));
 
 	triangleFloor floor1(12*4);
-	floor1.translate(glm::vec3(0.0f,-1.13f,0.0f));
-	floor1.scale(glm::vec3(4.0f,0.01f,4.0f));
+	/* Razresiti da kolizija radi sa rotiranom ravni
+	 * nece da stoji nego propada dalje */
+	// floor1.rotate(30, glm::vec3(1,0,0));
+	floor1.scale(glm::vec3(4.0f,0.05f,4.0f));
 	objectsToDisplay.push_back(&floor1);
 
 	user sampleUser;
+	sampleUser.addToCheckColisionList(&cs);
+	sampleUser.addToCheckColisionList(&floor1);
+	sampleUser.translate(glm::vec3(12,22,12));
+
 	objectsToDisplay.push_back(&sampleUser);
 	globalData.activeCamera = sampleUser.fpsViewCamera();
 

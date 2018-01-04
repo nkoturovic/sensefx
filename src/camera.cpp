@@ -14,5 +14,5 @@ glm::mat4 camera::viewMatrix() {
 		return glm::inverse(this->matrix);
 	}
 
-	return glm::lookAt(attachedTo->toWorld(glm::vec3(0,0,0)), attachedTo->toWorld(glm::vec3(0,0,-1)), glm::vec3(0,1,0));
+	return glm::lookAt(attachedTo->pointToWorldSys(glm::vec3(0,0,0)), attachedTo->pointToWorldSys(glm::vec3(0,0,-1)), glm::vec3(0,1,0));
 }

@@ -31,7 +31,7 @@ void object::draw() {
 	glPushMatrix();
 	glMultMatrixf(glm::value_ptr(matrix));
 	/* Iscrtava mrezu (kocku) oko "prostora" objekata */
-	// drawSurroundingGrid();
+	drawSurroundingGrid();
 	drawObject();
 	drawChildren();
 	glPopMatrix();
@@ -55,7 +55,7 @@ void object::scale(glm::vec3 scaleVec) {
 	matrix = glm::scale(matrix, scaleVec);
 }
 
-glm::mat4 object::transformationMatrix() {
+glm::mat4 object::pointTransformationMatrix() {
 	object * tmp_ptr = this;
 	glm::mat4 result_matrix(1.0f);
 
@@ -109,8 +109,66 @@ void object::moveKeys(bool pressedKeys[256]) {
 		moveLeft+=1.0f;
 
 	if (moveLeft || moveForward)
-		this->translate(glm::normalize(glm::vec3(moveLeft, 0, moveForward))*speed);
+		this->move(glm::normalize(glm::vec3(moveLeft, 0, moveForward))*speed);
 
+}
+
+void object::move(glm::vec3 moveVector) {
+
+	/* Provera da li objekat dolazi u koliziju sa bilo kojim
+	 * od objekata koje smo mu prosledili u checkColisionList */
+	for_each (checkColisionList.begin(), checkColisionList.end(), [this, &moveVector] (object * o) {
+
+		if (this->isColiding(o)) {
+			/* Centar objekta this u koordinatnom sistemu objekta o */
+			glm::vec3 thisCenterInO = o->pointToObjectSys(this, glm::vec3(0,0,0));
+
+			/* Trazimo normalu stranice kvadra */
+			if (fabs(thisCenterInO.x) > fabs(thisCenterInO.y)) {
+				thisCenterInO.y = 0;
+				if (fabs(thisCenterInO.x) > fabs(thisCenterInO.z))
+						thisCenterInO.z = 0;
+				else 
+						thisCenterInO.x = 0;
+			} else {
+				thisCenterInO.x = 0;
+				if (fabs(thisCenterInO.y) > fabs(thisCenterInO.z))
+						thisCenterInO.z = 0;
+				else 
+						thisCenterInO.y = 0;
+			}
+
+			/* Normala u koordinatnom sistemu objekta O */
+			glm::vec3 normalInO = glm::normalize(thisCenterInO);
+
+			/* Normala u koordinatnom sistemu objekta This */
+			glm::vec3 normalInThis = this->vecToObjectSys(o, normalInO);
+
+			glm::vec3 normalInThisNormalized = glm::normalize(normalInThis);
+
+			/* Intenzitet vektora brzine u smetu ove normale */
+			float projIntensity = glm::dot(moveVector, normalInThisNormalized);
+
+			/* Dozvoljava udaljavanje samo a ne priblizavanje kvadru */
+			if (projIntensity > 0)
+				projIntensity = 0;
+
+			/* Napokon oduzimamo od vektora brzine brzinu u smeru normale na kvadar */
+			glm::vec3 takeFromVelocity = normalInThisNormalized*projIntensity;
+			moveVector -= takeFromVelocity;
+		}
+	});
+
+	this->translate(moveVector);
+}
+
+void object::addToCheckColisionList(object * o) {
+	checkColisionList.push_back(o);
+}
+
+void object::removeFromCheckColisionList(object * o) {
+	checkColisionList.erase(
+		std::remove(checkColisionList.begin(), checkColisionList.end(), o), checkColisionList.end());
 }
 
 void object::rotateUpKeys(bool pressedKeys[256]) {
@@ -154,8 +212,8 @@ void object::rotateMouse(glm::vec2 delta) {
 	this->rotate(delta.y*mouseRotationSensitivity, glm::vec3(1,0,0));
 }
 
-glm::vec3 object::toObject(glm::vec3 worldVec) {
-	glm::mat4 transMat = transformationMatrix();
+glm::vec3 object::pointToObjectSys(glm::vec3 worldVec) {
+	glm::mat4 transMat = pointTransformationMatrix();
 	glm::mat4 inverse = glm::inverse(transMat);
 	glm::vec4 worldVec4(worldVec.x, worldVec.y, worldVec.z, 1.0f);
 	glm::vec4 resultVec4 = inverse*worldVec4;
@@ -164,27 +222,70 @@ glm::vec3 object::toObject(glm::vec3 worldVec) {
 	return glm::vec3(resultVec4.x/w, resultVec4.y/w, resultVec4.z/w);
 }
 
-glm::vec3 object::toObject(object * fromObj, glm::vec3 fromObjVec) {
+glm::vec3 object::vecToObjectSys(glm::vec3 worldVec) {
+	glm::mat4 transMat = pointTransformationMatrix();
+	glm::mat4 inverse = glm::inverse(transMat);
+	glm::vec4 worldVec4(worldVec.x, worldVec.y, worldVec.z, 1.0f);
+
+	glm::vec4 resultVec4 = inverse*worldVec4;
+	float w = resultVec4.w;
+	glm::vec3 resultVec3(resultVec4.x/w, resultVec4.y/w, resultVec4.z/w);
+
+	glm::vec4 resultOrigin4 = inverse*glm::vec4(0.0f,0.0f,0.0f,1.0f);
+	w = resultOrigin4.w;
+	glm::vec3 resultOrigin3(resultOrigin4.x/w, resultOrigin4.y/w, resultOrigin4.z/w);
+
+	return resultVec3 - resultOrigin3;
+}
+
+glm::vec3 object::pointToObjectSys(object * fromObj, glm::vec3 fromObjVec) {
 	glm::vec4 tmpVec4(fromObjVec.x, fromObjVec.y, fromObjVec.z, 1.0f);
-	glm::vec4 resultVec4 = fromObj->transformationMatrix(this)*tmpVec4;
+	glm::vec4 resultVec4 = fromObj->pointTransformationMatrix(this)*tmpVec4;
 	float w = resultVec4.w;
 	return glm::vec3(resultVec4.x/w, resultVec4.y/w, resultVec4.z/w);
 }
 
-glm::vec3 object::toWorld(glm::vec3 objVec) {
+glm::vec3 object::vecToObjectSys(object * fromObj, glm::vec3 fromObjVec) {
+	glm::mat4 tm = fromObj->pointTransformationMatrix(this);
+	glm::vec4 tmpVec4(fromObjVec.x, fromObjVec.y, fromObjVec.z, 1.0f);
+	glm::vec4 resultVec4 = tm*tmpVec4;
+	float w = resultVec4.w;
+	glm::vec3 resultVec3 = glm::vec3(resultVec4.x/w, resultVec4.y/w, resultVec4.z/w);
+
+	glm::vec4 resultOriginVec4 = tm*glm::vec4(0.0f,0.0f,0.0f,1.0f);
+	 w = resultOriginVec4.w;
+	glm::vec3 resultOriginVec3 = glm::vec3(resultOriginVec4.x/w, resultOriginVec4.y/w, resultOriginVec4.z/w);
+
+	return  resultVec3 - resultOriginVec3;
+}
+
+glm::vec3 object::pointToWorldSys(glm::vec3 objVec) {
 	glm::vec4 worldVec4(objVec.x, objVec.y, objVec.z, 1.0f);
-	glm::mat4 transMat = transformationMatrix();
+	glm::mat4 transMat = pointTransformationMatrix();
 	glm::vec4 resultVec4 = transMat*worldVec4;
 	float w = resultVec4.w;
 
 	return glm::vec3(resultVec4.x/w, resultVec4.y/w, resultVec4.z/w);
 }
 
-glm::mat4 object::transformationMatrix(object * obj2 ) {
+glm::vec3 object::vecToWorldSys(glm::vec3 objVec) {
+	glm::vec4 worldVec4(objVec.x, objVec.y, objVec.z, 1.0f);
+	glm::mat4 transMat = pointTransformationMatrix();
+	glm::vec4 resultVec4 = transMat*worldVec4;
+	float w = resultVec4.w;
+	glm::vec3 resultVec3 = glm::vec3(resultVec4.x/w, resultVec4.y/w, resultVec4.z/w);
+	glm::vec4 resultOriginVec4 = transMat*w*glm::vec4(0.0f,0.0f,0.0f,1.0f);
+	w = resultOriginVec4.w;
+	glm::vec3 resultOriginVec3 = glm::vec3(resultOriginVec4.x/w, resultOriginVec4.y/w, resultOriginVec4.z/w);
+
+	return resultVec3 - resultOriginVec3;
+}
+
+glm::mat4 object::pointTransformationMatrix(object * obj2 ) {
 
 	/* Mnozenje sa ovom daje world */
-	glm::mat4 transMat1 = this->transformationMatrix();
-	glm::mat4 transMat2 = glm::inverse(obj2->transformationMatrix());
+	glm::mat4 transMat1 = this->pointTransformationMatrix();
+	glm::mat4 transMat2 = glm::inverse(obj2->pointTransformationMatrix());
 
 	return transMat2*transMat1;
 }
@@ -198,7 +299,7 @@ bool object::isColiding(object * obj) {
 	float maxFloat = std::numeric_limits<float>::max();
 	glm::vec3 min(maxFloat,maxFloat,maxFloat);
 
-	glm::mat4 transMat = this->transformationMatrix(obj);
+	glm::mat4 transMat = this->pointTransformationMatrix(obj);
 	glm::vec4 tmp4;
 	glm::vec3 tmp3;
 	float tmpf;
@@ -219,10 +320,15 @@ bool object::isColiding(object * obj) {
 			min.z = tmpf;
 	}
 
-	if (min.x <= 1.0f && min.y <=1.0f && min.z <= 1.0f)
+	float detectNearness = 1.01f;
+	if (min.x <= detectNearness && min.y <= detectNearness && min.z <= detectNearness)
 		return true;
 
-	transMat = obj->transformationMatrix(this);
+	transMat = obj->pointTransformationMatrix(this);
+
+	min.x = maxFloat;
+	min.y = maxFloat;
+	min.z = maxFloat;
 
 	for(int i=0; i<8; i++) {
 		tmp4 = transMat*vertices[i];
@@ -239,7 +345,7 @@ bool object::isColiding(object * obj) {
 			min.z = tmpf;
 	}
 
-	if (min.x <= 1.0f && min.y <= 1.0f && min.z <= 1.0f)
+	if (min.x <= detectNearness && min.y <= detectNearness && min.z <= detectNearness)
 		return true;
 
 	return false;
