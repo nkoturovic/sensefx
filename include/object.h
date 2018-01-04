@@ -47,8 +47,8 @@ class object {
 		glm::vec3 pointToWorldSys(glm::vec3 objVec);
 		glm::vec3 pointToObjectSys(glm::vec3 worldVec);
 		glm::vec3 pointToObjectSys(object * fromObj, glm::vec3 fromObjVec);
-		glm::mat4 pointTransformationMatrix(object * obj2);
-		glm::mat4 pointTransformationMatrix();
+		glm::mat4 transformationMatrix(object * obj2);
+		glm::mat4 transformationMatrix();
 
 		/* Funkcije ispod "analogno kopiraju vektor!!"
 		 * pogledaj u isto mesto u koje ja gledam ume-
