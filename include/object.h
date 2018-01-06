@@ -14,6 +14,7 @@ class object {
 		std::vector <object*> checkColisionList;
 
 	public:
+		glm::vec3 velocity; // Za sada belezi samo gravitaciju (po y)
 		glm::mat4 matrix;
 
 

@@ -24,7 +24,7 @@ void head::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
 		headRotated += keyRotationSensitivity;
 
-		if (headRotated > 90.0f) {
+		if (headRotated > 89.0f) {
 			headRotated = oldHeadRotated;
 			return;
 		}
@@ -34,7 +34,7 @@ void head::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
 		headRotated -= keyRotationSensitivity;
 
-		if (headRotated < -90.0f) {
+		if (headRotated < -89.0f) {
 			headRotated = oldHeadRotated;
 			return;
 		}
@@ -50,12 +50,12 @@ void head::processMouseMove(glm::vec2 delta) {
 	float oldHeadRotated = headRotated;
 	headRotated += delta.y * mouseRotationSensitivity;
 
-	if (headRotated > 90.0f) {
+	if (headRotated > 89.0f) {
 		headRotated = oldHeadRotated;
 		return;
 	}
 
-	if (headRotated < -90.0f) {
+	if (headRotated < -89.0f) {
 		headRotated = oldHeadRotated;
 		return;
 	}

@@ -41,7 +41,6 @@ static void on_display()
 	
 	/* Iscrtavanje objekata */
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
-	objectsToDisplay[2]->move(glm::vec3(0,-0.2,0));
 	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [objectsToDisplay] (object * o) {
 		o->draw();
 	});
@@ -126,6 +125,20 @@ static void redisplay_timer(int value)
 	glutTimerFunc(globalData.redisplayTimerInterval, redisplay_timer, globalData.redisplayTimerId);
 }
 
+static void gravity_timer(int value)
+{
+	if (value != globalData.gravityTimerId)
+		return;
+
+	std::vector<object* > &toGravity = globalData.toGravity;
+	for_each (toGravity.begin(), toGravity.end(), [] (object * o) {
+		o->velocity.y -= 0.005;
+		o->move(glm::vec3(0,o->velocity.y,0));
+	});
+
+	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
+}
+
 int main(int argc, char * argv[])
 {
 	globalData.configs = config::importAll("configs", "DEVELOPMENT");
@@ -160,26 +173,29 @@ int main(int argc, char * argv[])
 	glutTimerFunc(globalData.redisplayTimerInterval, redisplay_timer, globalData.redisplayTimerId);
 	glutTimerFunc(globalData.mouseTimerInterval, mouse_timer, globalData.mouseTimerId);
 	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
+	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
 
 	/* Ispod je primer dat zbog testing-a */
 
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
 	std::vector<object* > &objectsToKeyboard = globalData.toKeyboard;
 	std::vector<object* > &objectsToMouseMove = globalData.toMouseMove;
+	std::vector<object* > &objectsToGravity = globalData.toGravity;
+	
 
 	axis cs(5);
 	objectsToDisplay.push_back(&cs);
 	cs.translate(glm::vec3(2,1,2));
 
 	triangleFloor floor1(12*4);
-	//floor1.rotate(30, glm::vec3(0,0,1));
+	floor1.rotate(11, glm::vec3(-.5,0,0.5));
 	floor1.scale(glm::vec3(4.0f,0.05f,4.0f));
 	objectsToDisplay.push_back(&floor1);
 
 	user sampleUser;
 	sampleUser.addToCheckColisionList(&cs);
 	sampleUser.addToCheckColisionList(&floor1);
-	sampleUser.translate(glm::vec3(12,22,12));
+	sampleUser.translate(glm::vec3(12,20,12));
 
 	objectsToDisplay.push_back(&sampleUser);
 	globalData.activeCamera = sampleUser.fpsViewCamera();
@@ -188,6 +204,7 @@ int main(int argc, char * argv[])
 
 	objectsToKeyboard.push_back(&sampleUser);
 	objectsToMouseMove.push_back(&sampleUser);
+	objectsToGravity.push_back(&sampleUser);
 
 	glutMainLoop();
 

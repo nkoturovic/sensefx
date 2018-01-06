@@ -20,6 +20,7 @@ class dataContainer {
 		std::vector <object*> toDisplay;
 		std::vector <object*> toKeyboard; 
 		std::vector <object*> toMouseMove;
+		std::vector <object*> toGravity;
 
 		camera * activeCamera;
 
@@ -37,6 +38,9 @@ class dataContainer {
 
 		const int keyboardTimerId = 2;
 		float keyboardTimerInterval = 10;
+
+		const int gravityTimerId = 3;
+		float gravityTimerInterval = 10;
 
 		glm::vec2 mousePosition;
 };

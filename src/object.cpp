@@ -177,6 +177,10 @@ void object::move(glm::vec3 moveVector) {
 			 else if (fabs(normalInO.y) > 0.98f && fabs(moveVector.y) < 0.01f &&  fabs(normalInThis.y) > 0.98f && (fabs(moveVector.x) > 0.0f || (fabs(moveVector.z) > 0.0f ))) {
 				addToVelocity.x = normalInThisNormalized.x*projIntensity;
 				addToVelocity.z = normalInThisNormalized.z*projIntensity;
+
+				/* Svugde gde ima velocity = 0 to znaci da je 
+				 * objekat udario u podlogu i da brzinu treba resetovati */
+				velocity.y = 0;
 			}
 			 /* SLUCAJ ZID */
 			 else if (fabs(normalInO.y) < 0.01f && fabs(moveVector.y) < 0.01f  && (fabs(moveVector.x) > 0.0f || fabs(moveVector.z) > 0.0f )) {
@@ -187,26 +191,38 @@ void object::move(glm::vec3 moveVector) {
 			/* Stoji na KRIVOM PODU */
 			else if (fabs(normalInO.y) > 0.0f && fabs(normalInThis.y) < 0.98 && fabs(moveVector.y) > 0.0f && fabs(moveVector.x) < 0.01f && fabs(moveVector.z) < 0.01f) {
 				addToVelocity.y = -moveVector.y;
+				velocity.y = 0;
 			}
 
 			/* Ima y brzinu po y-lonu normali ali je nije hteo (Slucaj Kretanje po krivom podu) */ 
 		       else if ((fabs(moveVector.x) > 0.0f || fabs(moveVector.z) >0.0f) && fabs(moveVector.y) < 0.01f  && fabs(normalInThis.y) > 0.0f && fabs(normalInO.y) > 0.01 && fabs(normalInThis.y) < 0.98f) {
 			       /*Nizbrdo */
 			if (projIntensitySigned > 0) {
-			      // ZASTO 0.14 NEMAM POOOOOOOOJJJJJJMAAAAAAAAAA 0.134
-			      // Ali it werks, skoro savrseno :)!
-				projIntensitySigned*= -0.134;
+				/* Za kretanje uzbrdo sa klizanjem otkomentarisi
+				 * sve linije za prefiksom #, a zakomentarisi sa 
+				 * postfiom @ i suprotno za stepenasto kretanje */
+
+			      	// ZASTO 0.14 NEMAM POOOOOOOOJJJJJJMAAAAAAAAAA 0.134
+			     	// Ali it werks, skoro savrseno :)!
+
+				/* x i z ce da dodaju na uspon usporenje (uncomment) */
 			      	addToVelocity.x = normalInThisNormalized.x*projIntensity;
 			      	addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned);
+			      	//addToVelocity.y = normalInThisNormalized.y*(projIntensity); //@
 				addToVelocity.z = normalInThisNormalized.z*projIntensity;
 		       } else {
 				/*UZBRDO */
-			      // ZASTO 0.14 NEMAM POOOOOOOOJJJJJJMAAAAAAAAAA 0.134
+			      	// ZASTO 0.14 NEMAM POOOOOOOOJJJJJJMAAAAAAAAAA 0.134
 				projIntensitySigned*= -0.134;
+				
+				/* x i z ce da dodaju na nizbrdicu ubrzanje (uncomment) */
 			      	addToVelocity.x = normalInThisNormalized.x*projIntensity;
-			      	addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned);
+			      	addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned); 
+			      	//addToVelocity.y = normalInThisNormalized.y*(projIntensity); //@
 				addToVelocity.z = normalInThisNormalized.z*projIntensity;
+
 		       }
+				velocity.y = 0;
 
 				/* ZA SADA NE DIRAJ RADI, sem ako imas neku super ideju */
 		        } else {
