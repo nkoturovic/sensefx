@@ -41,7 +41,7 @@ static void on_display()
 	
 	/* Iscrtavanje objekata */
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
-	objectsToDisplay[2]->move(glm::vec3(0,-0.05,0));
+	objectsToDisplay[2]->move(glm::vec3(0,-0.2,0));
 	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [objectsToDisplay] (object * o) {
 		o->draw();
 	});
@@ -172,9 +172,7 @@ int main(int argc, char * argv[])
 	cs.translate(glm::vec3(2,1,2));
 
 	triangleFloor floor1(12*4);
-	/* Razresiti da kolizija radi sa rotiranom ravni
-	 * nece da stoji nego propada dalje */
-	// floor1.rotate(30, glm::vec3(1,0,0));
+	//floor1.rotate(30, glm::vec3(0,0,1));
 	floor1.scale(glm::vec3(4.0f,0.05f,4.0f));
 	objectsToDisplay.push_back(&floor1);
 

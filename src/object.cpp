@@ -117,9 +117,13 @@ void object::move(glm::vec3 moveVector) {
 
 	/* Provera da li objekat dolazi u koliziju sa bilo kojim
 	 * od objekata koje smo mu prosledili u checkColisionList */
-	for_each (checkColisionList.begin(), checkColisionList.end(), [this, &moveVector] (object * o) {
+	// Potrebno ukljuciti dole na kraju funkcije //
+	int numOfColidingY = 0;
+
+	for_each (checkColisionList.begin(), checkColisionList.end(), [&numOfColidingY,this, &moveVector] (object * o) {
 
 		if (this->isColiding(o)) {
+
 			/* Centar objekta this u koordinatnom sistemu objekta o */
 			glm::vec3 thisCenterInO = o->pointToObjectSys(this, glm::vec3(0,0,0));
 
@@ -141,22 +145,84 @@ void object::move(glm::vec3 moveVector) {
 			/* Normala u koordinatnom sistemu objekta O */
 			glm::vec3 normalInO = glm::normalize(thisCenterInO);
 
+			/* Osiguravamo da ima podloga */
+			if (abs(normalInO.y) > 0.0f)
+				numOfColidingY++;
+
+			//glm::vec3 moveVecInThisNormalized = glm::normalize(moveVector);
+
 			/* Normala u koordinatnom sistemu objekta This */
 			glm::vec3 normalInThis = this->vecToObjectSys(o, normalInO);
-
 			glm::vec3 normalInThisNormalized = glm::normalize(normalInThis);
 
 			/* Intenzitet vektora brzine u smetu ove normale */
-			float projIntensity = glm::dot(moveVector, normalInThisNormalized);
-
-			/* Dozvoljava udaljavanje samo a ne priblizavanje kvadru */
+			float projIntensity = glm::dot((glm::vec3) moveVector, (glm::vec3) normalInThisNormalized);
+			float projIntensitySigned = projIntensity;
 			projIntensity = fabs(projIntensity);
+			//float projIntensityNormal = projIntensity/glm::length(moveVector);
 
-			/* Napokon oduzimamo od vektora brzine brzinu u smeru normale na kvadar */
-			glm::vec3 addToVelocity = normalInThisNormalized*projIntensity;
+			//float cosAngle = angle(glm::normalize(moveVector),normalInThisNormalized)/M_PI;
+			//float cosAngle = projIntensity/glm::length(moveVector);
+			//float sinAngle = sqrt(1-cosAngle*cosAngle);
+
+			glm::vec3 addToVelocity(0,0,0);
+
+			/* Ima brzinu po normali i hteo je samo po y-lonu */
+			/* Slucaj STOJI na kutiji */
+			if (fabs(normalInO.y) > 0.98f && fabs(normalInThis.y) > 0.98 && fabs(moveVector.y) > 0.0f && fabs(moveVector.x) < 0.01f && fabs(moveVector.z) < 0.01f) {
+				addToVelocity.y = -moveVector.y;
+			}
+
+			/* Slucaj KRECE se po kutiji ==  */
+			 else if (fabs(normalInO.y) > 0.98f && fabs(moveVector.y) < 0.01f &&  fabs(normalInThis.y) > 0.98f && (fabs(moveVector.x) > 0.0f || (fabs(moveVector.z) > 0.0f ))) {
+				addToVelocity.x = normalInThisNormalized.x*projIntensity;
+				addToVelocity.z = normalInThisNormalized.z*projIntensity;
+			}
+			 /* SLUCAJ ZID */
+			 else if (fabs(normalInO.y) < 0.01f && fabs(moveVector.y) < 0.01f  && (fabs(moveVector.x) > 0.0f || fabs(moveVector.z) > 0.0f )) {
+				addToVelocity.x = normalInThisNormalized.x*projIntensity;
+				addToVelocity.z = normalInThisNormalized.z*projIntensity;
+			}
+
+			/* Stoji na KRIVOM PODU */
+			else if (fabs(normalInO.y) > 0.0f && fabs(normalInThis.y) < 0.98 && fabs(moveVector.y) > 0.0f && fabs(moveVector.x) < 0.01f && fabs(moveVector.z) < 0.01f) {
+				addToVelocity.y = -moveVector.y;
+			}
+
+			/* Ima y brzinu po y-lonu normali ali je nije hteo (Slucaj Kretanje po krivom podu) */ 
+		       else if ((fabs(moveVector.x) > 0.0f || fabs(moveVector.z) >0.0f) && fabs(moveVector.y) < 0.01f  && fabs(normalInThis.y) > 0.0f && fabs(normalInO.y) > 0.01 && fabs(normalInThis.y) < 0.98f) {
+			       /*Nizbrdo */
+			if (projIntensitySigned > 0) {
+			      // ZASTO 0.14 NEMAM POOOOOOOOJJJJJJMAAAAAAAAAA 0.134
+			      // Ali it werks, skoro savrseno :)!
+				projIntensitySigned*= -0.134;
+			      	addToVelocity.x = normalInThisNormalized.x*projIntensity;
+			      	addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned);
+				addToVelocity.z = normalInThisNormalized.z*projIntensity;
+		       } else {
+				/*UZBRDO */
+			      // ZASTO 0.14 NEMAM POOOOOOOOJJJJJJMAAAAAAAAAA 0.134
+				projIntensitySigned*= -0.134;
+			      	addToVelocity.x = normalInThisNormalized.x*projIntensity;
+			      	addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned);
+				addToVelocity.z = normalInThisNormalized.z*projIntensity;
+		       }
+
+				/* ZA SADA NE DIRAJ RADI, sem ako imas neku super ideju */
+		        } else {
+				/* Ne treba nista - ovo ostali slucajevi */
+			/* Slobodan pad */
+			}
 			moveVector += addToVelocity;
-		}
+			}
 	});
+
+	/* Kada PADAS ne kreci se, za to je ovo
+	 * ispod potrebno ukljuviti (kod slobodnog pada */
+	if(numOfColidingY == 0) {
+			//moveVector.x = 0.0f;
+			//moveVector.z = 0.0f;
+	}
 
 	this->translate(moveVector);
 }
