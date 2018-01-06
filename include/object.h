@@ -11,7 +11,10 @@ class object {
 
 	protected:
 		float speed = 0.1;
+		float jump = 0.15;
+
 		std::vector <object*> checkColisionList;
+		bool isOnGround = false;;
 
 	public:
 		glm::vec3 velocity; // Za sada belezi samo gravitaciju (po y)
@@ -67,6 +70,7 @@ class object {
 		void moveKeys(bool pressedKeys[256]);
 		void rotateLeftKeys(bool pressedKeys[256]);
 		void rotateUpKeys(bool pressedKeys[256]);
+		void jumpKeys(bool pressedKeys[256]);
 
 		void virtual processMouseMove(glm::vec2 delta);
 		void rotateMouse(glm::vec2 delta);

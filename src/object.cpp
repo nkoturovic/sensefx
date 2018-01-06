@@ -31,7 +31,7 @@ void object::draw() {
 	glPushMatrix();
 	glMultMatrixf(glm::value_ptr(matrix));
 	/* Iscrtava mrezu (kocku) oko "prostora" objekata */
-	drawSurroundingGrid();
+	//drawSurroundingGrid();
 	drawObject();
 	drawChildren();
 	glPopMatrix();
@@ -87,6 +87,7 @@ void object::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 	/* Rotitanje objekta ijkl */
 	rotateUpKeys(pressedKeys);
 	rotateLeftKeys(pressedKeys);
+	jumpKeys(pressedKeys);
 
 }
 
@@ -169,35 +170,66 @@ void object::move(glm::vec3 moveVector) {
 
 			/* Ima brzinu po normali i hteo je samo po y-lonu */
 			/* Slucaj STOJI na kutiji */
-			if (fabs(normalInO.y) > 0.98f && fabs(normalInThis.y) > 0.98 && fabs(moveVector.y) > 0.0f && fabs(moveVector.x) < 0.01f && fabs(moveVector.z) < 0.01f) {
+			if (normalInO.y > 0.98f && fabs(normalInThisNormalized.y) > 0.98 && fabs(moveVector.y) > 0.0f && fabs(moveVector.x) < 0.01f && fabs(moveVector.z) < 0.01f) {
 				addToVelocity.y = -moveVector.y;
+
+				/* Svugde gde ima isOnGround = true to znaci da je 
+				 * objekat udario u podlogu (mora da pada kada udari 
+				 * zato ovo manje od 0*/
+				if (this->velocity.y <= 0.01f) {
+					this->velocity.y = 0; 
+					this->isOnGround = true;
+				} else {
+					addToVelocity.y = moveVector.y;
+				}
+			}
+
+			/* Slucaj udara u kutiju odozdo ==  mozda nije potrebno */
+			else if (normalInO.y < 0.98f && fabs(normalInThisNormalized.y) > 0.98 && fabs(moveVector.y) > 0.0f
+					&& fabs(moveVector.x) < 0.01f && fabs(moveVector.z) < 0.01f) {
+				addToVelocity.y = 0.0f;
 			}
 
 			/* Slucaj KRECE se po kutiji ==  */
-			 else if (fabs(normalInO.y) > 0.98f && fabs(moveVector.y) < 0.01f &&  fabs(normalInThis.y) > 0.98f && (fabs(moveVector.x) > 0.0f || (fabs(moveVector.z) > 0.0f ))) {
+			 else if (fabs(normalInO.y) > 0.98f && fabs(moveVector.y) < 0.01f &&  fabs(normalInThisNormalized.y) > 0.98f && 
+					 (fabs(moveVector.x) > 0.0f || (fabs(moveVector.z) > 0.0f ))) {
 				addToVelocity.x = normalInThisNormalized.x*projIntensity;
 				addToVelocity.z = normalInThisNormalized.z*projIntensity;
-
-				/* Svugde gde ima velocity = 0 to znaci da je 
-				 * objekat udario u podlogu i da brzinu treba resetovati */
-				velocity.y = 0;
 			}
 			 /* SLUCAJ ZID */
 			 else if (fabs(normalInO.y) < 0.01f && fabs(moveVector.y) < 0.01f  && (fabs(moveVector.x) > 0.0f || fabs(moveVector.z) > 0.0f )) {
-				addToVelocity.x = normalInThisNormalized.x*projIntensity;
-				addToVelocity.z = normalInThisNormalized.z*projIntensity;
+				if (fabs(normalInThisNormalized.y) > 0.0f) {
+					/* Kriv zid */
+					addToVelocity.x = normalInThisNormalized.x * 2;
+					addToVelocity.z = normalInThisNormalized.z * 2;
+					addToVelocity.y = -7; // Propadni bolje nego da udjes u zid
+				}else {
+					/* prav zid */
+					addToVelocity.x = normalInThisNormalized.x*projIntensity;
+					addToVelocity.z = normalInThisNormalized.z*projIntensity;
+				}
+				
 			}
 
 			/* Stoji na KRIVOM PODU */
-			else if (fabs(normalInO.y) > 0.0f && fabs(normalInThis.y) < 0.98 && fabs(moveVector.y) > 0.0f && fabs(moveVector.x) < 0.01f && fabs(moveVector.z) < 0.01f) {
+			else if (fabs(normalInO.y) > 0.0f && fabs(normalInThisNormalized.y) < 0.98 && fabs(moveVector.y) > 0.0f && 
+					fabs(moveVector.x) < 0.01f && fabs(moveVector.z) < 0.01f) {
 				addToVelocity.y = -moveVector.y;
-				velocity.y = 0;
+
+				if (this->velocity.y <= 0.01f) {
+					this->velocity.y = 0;
+					this->isOnGround = true;
+				} else {
+					addToVelocity.y = moveVector.y;
+				}
 			}
 
 			/* Ima y brzinu po y-lonu normali ali je nije hteo (Slucaj Kretanje po krivom podu) */ 
-		       else if ((fabs(moveVector.x) > 0.0f || fabs(moveVector.z) >0.0f) && fabs(moveVector.y) < 0.01f  && fabs(normalInThis.y) > 0.0f && fabs(normalInO.y) > 0.01 && fabs(normalInThis.y) < 0.98f) {
+		       else if ((fabs(moveVector.x) > 0.0f || fabs(moveVector.z) >0.0f) && fabs(moveVector.y) < 0.01f  && 
+				       fabs(normalInThisNormalized.y) > 0.0f && fabs(normalInO.y) > 0.01 && fabs(normalInThisNormalized.y) < 0.98f) {
 			       /*Nizbrdo */
 			if (projIntensitySigned > 0) {
+				projIntensitySigned*= 0.134;
 				/* Za kretanje uzbrdo sa klizanjem otkomentarisi
 				 * sve linije za prefiksom #, a zakomentarisi sa 
 				 * postfiom @ i suprotno za stepenasto kretanje */
@@ -207,22 +239,21 @@ void object::move(glm::vec3 moveVector) {
 
 				/* x i z ce da dodaju na uspon usporenje (uncomment) */
 			      	addToVelocity.x = normalInThisNormalized.x*projIntensity;
-			      	addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned);
-			      	//addToVelocity.y = normalInThisNormalized.y*(projIntensity); //@
+			      	//addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned);
+			      	addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned); //@
 				addToVelocity.z = normalInThisNormalized.z*projIntensity;
 		       } else {
 				/*UZBRDO */
 			      	// ZASTO 0.14 NEMAM POOOOOOOOJJJJJJMAAAAAAAAAA 0.134
 				projIntensitySigned*= -0.134;
+				//projIntensitySigned = projIntensity;
 				
 				/* x i z ce da dodaju na nizbrdicu ubrzanje (uncomment) */
 			      	addToVelocity.x = normalInThisNormalized.x*projIntensity;
-			      	addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned); 
+			      	addToVelocity.y = normalInThisNormalized.y*(projIntensitySigned);
 			      	//addToVelocity.y = normalInThisNormalized.y*(projIntensity); //@
 				addToVelocity.z = normalInThisNormalized.z*projIntensity;
-
 		       }
-				velocity.y = 0;
 
 				/* ZA SADA NE DIRAJ RADI, sem ako imas neku super ideju */
 		        } else {
@@ -234,8 +265,11 @@ void object::move(glm::vec3 moveVector) {
 	});
 
 	/* Kada PADAS ne kreci se, za to je ovo
-	 * ispod potrebno ukljuviti (kod slobodnog pada */
+	 * ispod potrebno ukljuviti (kod slobodnog pada 
+	 * I PLUS DA ZNA KAD NEMA PODLOGU ZA SKOK*/
+
 	if(numOfColidingY == 0) {
+		this->isOnGround = false;
 			//moveVector.x = 0.0f;
 			//moveVector.z = 0.0f;
 	}
@@ -281,6 +315,16 @@ void object::rotateLeftKeys(bool pressedKeys[256]) {
 
 	if (rotateLeft)
 		this->rotate(rotateLeft, glm::vec3(0,1,0));
+}
+
+void object::jumpKeys(bool pressedKeys[256]) {
+
+	if (pressedKeys[keybindings.jumpKey]) {
+		if (this->isOnGround) {
+			this->translate(glm::vec3(0,0.1,0));
+			this->velocity.y = jump;
+		}
+	}
 }
 
 void object::processMouseMove(glm::vec2 delta) {

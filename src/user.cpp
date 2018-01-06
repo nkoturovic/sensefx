@@ -67,6 +67,7 @@ void user::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
 	moveKeys(pressedKeys);
 	rotateLeftKeys(pressedKeys);
+	jumpKeys(pressedKeys);
 
 	this->userHead.processKeyboardInput(pressedKeys, x, y);
 }

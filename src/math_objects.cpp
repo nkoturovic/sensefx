@@ -8,6 +8,7 @@
 /* ######### GRID ######### */
 grid::grid(object * parent, int numOfUnits) : object(parent), numOfUnits(numOfUnits) {}
 grid::grid(int numOfUnits) : grid(NULL, numOfUnits) {}
+grid::grid() : grid(NULL, 10) {}
 
 void grid::drawObject() {
 
@@ -37,10 +38,42 @@ void grid::drawObject() {
 		glEnd();
 }
  
+wireCube::wireCube(object * parent) : object(parent) {}
+wireCube::wireCube() : wireCube(NULL){}
+
+void wireCube::drawObject() {
+	glColor3f(0,1,0);
+	glBegin(GL_LINE_STRIP);
+		glVertex3f(-1,-1,-1);
+		glVertex3f(-1,-1,1);
+		glVertex3f(1,-1,1);
+		glVertex3f(1,-1,-1);
+		glVertex3f(-1,-1,-1);
+
+		glVertex3f(-1,1,-1);
+		glVertex3f(-1,1,1);
+		glVertex3f(1,1,1);
+		glVertex3f(1,1,-1);
+		glVertex3f(-1,1,-1);
+	glEnd();
+
+	glBegin(GL_LINES);
+
+		glVertex3f(1,-1,-1);
+		glVertex3f(1,1,-1);
+		glVertex3f(-1,-1,1);
+		glVertex3f(-1,1,1);
+		glVertex3f(1,-1,1);
+		glVertex3f(1,1,1);
+
+	glEnd();
+}
+
 
 /* ######### AXIS ######### */
 axis::axis(object * parent, int numOfUnits) : object(parent), numOfUnits(numOfUnits) {}
 axis::axis(int numOfUnits) : axis(NULL, numOfUnits) {}
+axis::axis() : axis(NULL, 5) {}
 
 void axis::drawObject() {
 

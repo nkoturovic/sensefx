@@ -12,6 +12,7 @@ class axis : public object {
 
 		axis(object * parent, int numOfUnits);
 		axis(int numOfUnits);
+		axis();
 
 		void drawObject();
 };
@@ -27,9 +28,20 @@ class grid : public object {
 
 		grid(object * parent, int numOfUnits);
 		grid(int numOfUnits);
+		grid();
 
 		void drawObject();
 };
+
+class wireCube : public object {
+
+	public:
+		wireCube(object * parent);
+		wireCube();
+
+		void drawObject();
+};
+
 
 class plane : public object {
 

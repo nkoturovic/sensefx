@@ -30,7 +30,7 @@ dataContainer globalData;
 static void on_display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.5, 0.0, 0.0, 1); // Klasa color potrebna (mozda i ne)
+	glClearColor(0.08, 0.08, 0.17, 1); // Klasa color potrebna (mozda i ne)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -133,7 +133,8 @@ static void gravity_timer(int value)
 	std::vector<object* > &toGravity = globalData.toGravity;
 	for_each (toGravity.begin(), toGravity.end(), [] (object * o) {
 		o->velocity.y -= 0.005;
-		o->move(glm::vec3(0,o->velocity.y,0));
+		//o->move(glm::vec3(0,o->velocity.y,0));
+		o->move(glm::vec3(o->velocity.x,o->velocity.y,o->velocity.z));
 	});
 
 	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
@@ -168,6 +169,7 @@ int main(int argc, char * argv[])
 	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(on_keyboard);
 	glutKeyboardUpFunc(on_keyboard_release);
+	glutMotionFunc(on_mouse_move);
 	glutPassiveMotionFunc(on_mouse_move);
 	glutSetCursor(GLUT_CURSOR_NONE);
 	glutTimerFunc(globalData.redisplayTimerInterval, redisplay_timer, globalData.redisplayTimerId);
@@ -175,7 +177,7 @@ int main(int argc, char * argv[])
 	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
 	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
 
-	/* Ispod je primer dat zbog testing-a */
+	/* Ispod je dat primer programa zbog testiranja-a */
 
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
 	std::vector<object* > &objectsToKeyboard = globalData.toKeyboard;
@@ -183,19 +185,28 @@ int main(int argc, char * argv[])
 	std::vector<object* > &objectsToGravity = globalData.toGravity;
 	
 
-	axis cs(5);
-	objectsToDisplay.push_back(&cs);
-	cs.translate(glm::vec3(2,1,2));
+	//axis cs(5);
+	//cs.scale(glm::vec3(1,0.5f,1));
+	//objectsToDisplay.push_back(&cs);
+	//cs.translate(glm::vec3(2,1,2));
 
-	triangleFloor floor1(12*4);
-	floor1.rotate(11, glm::vec3(-.5,0,0.5));
-	floor1.scale(glm::vec3(4.0f,0.05f,4.0f));
+	wireCube floor1;
+	grid floor1Grid(12*4);
+	floor1Grid.translate(glm::vec3(0.0f,0.9f,0.0f));
+	floor1Grid.fill = true;
+	floor1.addChild(&floor1Grid);
+	axis originCs;
+	originCs.scale(glm::vec3(4.0f,4.0f,4.0f));
+	objectsToDisplay.push_back(&originCs);
+	
+	floor1.rotate(12, glm::vec3(-.5,0,0.5));
+	floor1.scale(glm::vec3(4.0f,0.5f,4.0f));
 	objectsToDisplay.push_back(&floor1);
 
 	user sampleUser;
-	sampleUser.addToCheckColisionList(&cs);
+	//sampleUser.addToCheckColisionList(&cs);
 	sampleUser.addToCheckColisionList(&floor1);
-	sampleUser.translate(glm::vec3(12,20,12));
+	sampleUser.translate(glm::vec3(0,4,0));
 
 	objectsToDisplay.push_back(&sampleUser);
 	globalData.activeCamera = sampleUser.fpsViewCamera();
@@ -205,6 +216,37 @@ int main(int argc, char * argv[])
 	objectsToKeyboard.push_back(&sampleUser);
 	objectsToMouseMove.push_back(&sampleUser);
 	objectsToGravity.push_back(&sampleUser);
+
+	wireCube cubes[65];
+	grid topOfCube;
+	topOfCube.fill = true;
+	topOfCube.translate(glm::vec3(0,0.86f,0));
+	int i;
+	for (i=0; i<65; i++) {
+		cubes[i].rotate((float)i/20.0f*180, glm::vec3(0,1,0));
+		cubes[i].translate(glm::vec3(i*0.15+5.3, i*0.3f, i*0.15+5.3));
+		cubes[i].scale(glm::vec3(1.0f, 0.21f, 1.0f));
+		sampleUser.addToCheckColisionList(&cubes[i]);
+		objectsToDisplay.push_back(&cubes[i]);
+		cubes[i].addChild(&topOfCube);
+	}
+
+	grid floor2Grid(12*4);
+	wireCube floor2;
+	sampleUser.addToCheckColisionList(&floor2);
+	floor2Grid.translate(glm::vec3(0.0f,0.9f,0.0f));
+	floor2Grid.fill= true;
+	floor2.addChild(&floor2Grid);
+
+	axis origin2Cs;
+	origin2Cs.scale(glm::vec3(1.0f,5.0f,1.0f));
+
+	floor2.rotate((float)i/20.0f*180, glm::vec3(0,1,0));
+	floor2.translate(glm::vec3(i*0.15+3, i*0.25f, i*0.15+5.3));
+
+	floor2.scale(glm::vec3(4.0f,0.5f,4.0f));
+	objectsToDisplay.push_back(&floor2);
+
 
 	glutMainLoop();
 

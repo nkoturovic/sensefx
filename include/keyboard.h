@@ -15,6 +15,7 @@ class keyboard {
 		unsigned char moveBackKey;
 		unsigned char moveLeftKey;
 		unsigned char moveRightKey;
+		unsigned char jumpKey;
 
 		unsigned char rotateUpKey;
 		unsigned char rotateDownKey;

@@ -6,6 +6,7 @@ void keyboard::init (config keyBindings) {
 	moveBackKey = keyBindings.getParameter("MOVE_BACK").c_str()[0];
 	moveLeftKey = keyBindings.getParameter("MOVE_LEFT").c_str()[0];
 	moveRightKey = keyBindings.getParameter("MOVE_RIGHT").c_str()[0];
+	jumpKey = keyBindings.getParameter("JUMP").c_str()[0];
 
 	keyRotationSensitivity = std::stof(keyBindings.getParameter("KEYS_ROTATION_SENSITIVITY"));
 
