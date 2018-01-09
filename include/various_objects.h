@@ -2,8 +2,9 @@
 #define SENSEFX_VARIOUS_OBJECTS_H
 
 #include "object.h"
+#include "drawable.h"
 
-class chessFloor : public object {
+class chessFloor : public drawable {
 
 	public:
 		int numOfUnits=8;
@@ -17,7 +18,7 @@ class chessFloor : public object {
 		void drawChessSingleTexture();
 };
 
-class triangleFloor : public object {
+class triangleFloor : public drawable {
 
 	public:
 		int numOfUnits=8;

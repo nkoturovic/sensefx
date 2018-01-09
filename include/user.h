@@ -3,8 +3,9 @@
 
 #include "object.h"
 #include "camera.h"
+#include "movable.h"
 
-class head : public object {
+class head : public movable {
 
 	private:
 		float headRotated=0.0f;
@@ -20,7 +21,7 @@ class head : public object {
 };
 
 
-class user : public object {
+class user : public movable {
 
 	private:
 		glm::vec3 headToBodyRatio = glm::vec3(0.275f,0.1f,0.275f);
@@ -29,7 +30,8 @@ class user : public object {
 	public:
 		head userHead;
 
-		user(object * parent);
+		user(object * parent, float speed, float jump);
+		user(float speed, float jump);
 		user();
 
 		void drawObject();

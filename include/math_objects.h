@@ -2,8 +2,10 @@
 #define SENSEFX_MATH_OBJECTS_H
 
 #include "object.h"
+#include "drawable.h"
+#include "transformable.h"
 
-class axis : public object {
+class axis : public drawable, public transformable {
 
 	private:
 		int numOfUnits = 5;
@@ -18,7 +20,7 @@ class axis : public object {
 };
 
 
-class grid : public object {
+class grid : public drawable, public transformable {
 
 	private:
 		int numOfUnits = 5;
@@ -33,7 +35,7 @@ class grid : public object {
 		void drawObject();
 };
 
-class wireCube : public object {
+class wireCube : public drawable, public transformable {
 
 	public:
 		wireCube(object * parent);
@@ -43,7 +45,7 @@ class wireCube : public object {
 };
 
 
-class plane : public object {
+class plane : public drawable, public transformable {
 
 	public:
 		bool drawMaterial = true;
@@ -52,7 +54,6 @@ class plane : public object {
 
 		void drawObject();
 };
-
 
 
 #endif // SENSEFX_MATH_OBJECTS_H

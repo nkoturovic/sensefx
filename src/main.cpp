@@ -15,6 +15,9 @@
 #include "dataContainer.h"
 #include "config.h"
 #include "object.h"
+#include "drawable.h"
+#include "movable.h"
+
 #include "user.h"
 #include "camera.h"
 #include "math_objects.h"
@@ -42,7 +45,8 @@ static void on_display()
 	/* Iscrtavanje objekata */
 	std::vector<object* > &objectsToDisplay = globalData.toDisplay;
 	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [objectsToDisplay] (object * o) {
-		o->draw();
+		if(drawable * d_o = dynamic_cast<drawable*>(o))
+			d_o->draw();
 	});
 
 	glutSwapBuffers();
@@ -94,7 +98,8 @@ static void mouse_timer(int value) {
 
 	std::vector<object* > &objectsToMouseMove = globalData.toMouseMove;
 	for_each (objectsToMouseMove.begin(), objectsToMouseMove.end(), [delta] (object * o) {
-		o->processMouseMove(delta);
+		if(movable* m_o = dynamic_cast<movable*>(o)) 
+			m_o->processMouseMove(delta);
 	});
 
 	glutWarpPointer( center.x , center.y );
@@ -110,7 +115,8 @@ static void keyboard_timer(int value) {
 	/* TODO: Obradjivanje zahteva tastature, ne bi trebalo ovde da stoje verovatno!!! */
 	std::vector<object* > &objectsToKeyboard = globalData.toKeyboard;
 	for_each (objectsToKeyboard.begin(), objectsToKeyboard.end(), [] (object * o) {
-		o->processKeyboardInput(globalData.pressedKeys, globalData.keyPressedPositionX, globalData.keyPressedPositionY);
+		if(movable* m_o = dynamic_cast<movable*>(o))
+			m_o->processKeyboardInput(globalData.pressedKeys, globalData.keyPressedPositionX, globalData.keyPressedPositionY);
 	});
 
 	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
@@ -132,9 +138,10 @@ static void gravity_timer(int value)
 
 	std::vector<object* > &toGravity = globalData.toGravity;
 	for_each (toGravity.begin(), toGravity.end(), [] (object * o) {
-		o->velocity.y -= 0.005;
-		//o->move(glm::vec3(0,o->velocity.y,0));
-		o->move(glm::vec3(o->velocity.x,o->velocity.y,o->velocity.z));
+		if(movable* m_o = dynamic_cast<movable*>(o)) {
+			m_o->addToVelocity(glm::vec3(0.0f, -0.005, 0.0f));
+			m_o->move(m_o->getVelocity());
+		}
 	});
 
 	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);

@@ -11,6 +11,17 @@ head::head() {
 	this->firstPerson.attachedTo = this;
 }
 
+user::user(object * parent, float speed, float jump) : object(parent), movable(speed,jump) {
+	scale(userToWorldRatio);
+	userHead.setParent(this);
+	userHead.translate(glm::vec3(0.0f,0.84f,0.0f));
+	userHead.scale(headToBodyRatio);
+}
+
+user::user(float speed, float jump) : user(NULL, speed, jump) {}
+user::user() : user(NULL, 0.25, 0.15) {}
+
+
 void head::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
 	/* Data funkcija proverava da li je vertikalna rotacija
@@ -80,16 +91,6 @@ void user::processMouseMove(glm::vec2 delta) {
 void head::drawObject(){
 }
 
-user::user(object * parent) : object(parent) {
-	this->speed = 0.25f;
-
-	scale(userToWorldRatio);
-	userHead.setParent(this);
-	userHead.translate(glm::vec3(0.0f,0.84f,0.0f));
-	userHead.scale(headToBodyRatio);
-}
-
-user::user() : user(NULL) {}
 
 void user::drawObject() {
 }
