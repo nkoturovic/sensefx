@@ -1,33 +1,33 @@
 #ifndef SENSEFX_VARIOUS_OBJECTS_H
 #define SENSEFX_VARIOUS_OBJECTS_H
 
-#include "object.h"
-#include "drawable.h"
+#include "Object.h"
+#include "DrawableObject.h"
 
-class chessFloor : public drawable {
+class ChessFloor : public DrawableObject {
 
 	public:
 		int numOfUnits=8;
 
-		chessFloor(object * parent, int numOfUnits);
-		chessFloor(object * parent);
-		chessFloor(int numOfUnits);
-		chessFloor();
+		ChessFloor(Object * parent, int numOfUnits);
+		ChessFloor(Object * parent);
+		ChessFloor(int numOfUnits);
+		ChessFloor();
 
 		void drawObject();
 		void drawChessSingleTexture();
 };
 
-class triangleFloor : public drawable {
+class TriangleFloor : public DrawableObject {
 
 	public:
 		int numOfUnits=8;
 
-		triangleFloor(object * parent, int numOfUnits);
-		triangleFloor(object * parent);
-		triangleFloor(int numOfUnits);
-		triangleFloor();
-
+		TriangleFloor(Object * parent, int numOfUnits);
+		TriangleFloor(Object * parent);
+		TriangleFloor(int numOfUnits);
+		TriangleFloor();
+                
 		void drawObject();
 		void drawtriangleSingleTexture();
 };

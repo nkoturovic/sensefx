@@ -5,7 +5,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
-class object {
+class Object {
 
 	private:
 		/* Matrica pozicije u odnosu na roditelja
@@ -13,24 +13,24 @@ class object {
 		glm::mat4 positioningMatrix;
 
 	protected:
-		std::vector <object*> children;
+		std::vector <Object*> children;
 
 	public:
-		object * parent = NULL;
+		Object * parent = NULL;
 
-		object();
-		object(object * parent);
-		virtual ~object();
+		Object();
+		Object(Object * parent);
+		virtual ~Object();
 
 		glm::mat4 getPositioningMatrix();
 		void setPositioningMatrix(glm::mat4 matrix);
 
-		void addChild(object *o);
-		void setParent(object * parent);
+		void addChild(Object *o);
+		void setParent(Object * parent);
 		void setNoParent();
 
 		/* Matrica koja transformise iz obj2 CS u this objects CS */
-		glm::mat4 transformationMatrix(object * obj2);
+		glm::mat4 transformationMatrix(Object * obj2);
 		/* Matrica koja transformise iz WCS u this objects CS */
 		glm::mat4 transformationMatrix();
 
@@ -40,7 +40,7 @@ class object {
 		 * dobija polozaj "udajlene tacke" u (this) reperu */
 		glm::vec3 pointToWorldSys(glm::vec3 objVec);
 		glm::vec3 pointToObjectSys(glm::vec3 worldVec);
-		glm::vec3 pointToObjectSys(object * fromObj, glm::vec3 fromObjVec);
+		glm::vec3 pointToObjectSys(Object * fromObj, glm::vec3 fromObjVec);
 
 		/* Funkcije "analogno kopiraju vektor!!"
 		 * pogledaj u isto mesto u koje ja gledam ume-
@@ -49,7 +49,7 @@ class object {
 		 * repera - oduzima se od pozicije tacke) */
 		glm::vec3 vecToWorldSys(glm::vec3 objVec);
 		glm::vec3 vecToObjectSys(glm::vec3 worldVec);
-		glm::vec3 vecToObjectSys(object * fromObj, glm::vec3 fromObjVec);
+		glm::vec3 vecToObjectSys(Object * fromObj, glm::vec3 fromObjVec);
 };
 
 #endif

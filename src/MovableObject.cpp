@@ -1,12 +1,12 @@
-#include "movable.h"
+#include "MovableObject.h"
 
 #include <algorithm>
 
-movable::movable(float speed, float jump) : speed(speed), jump(jump) { }
+MovableObject::MovableObject(float speed, float jump) : speed(speed), jump(jump) { }
 
-movable::movable() : movable(0.1, 0.15) {};
+MovableObject::MovableObject() : MovableObject(0.1, 0.15) {};
 
-void movable::moveKeys(bool pressedKeys[256]) {
+void MovableObject::moveKeys(bool pressedKeys[256]) {
 
 	/* Kretanje napred,nazad,levo,desno (komb.) */
 
@@ -32,14 +32,14 @@ void movable::moveKeys(bool pressedKeys[256]) {
 /* UPOZORENJE!! - Funkcija je napisana prilicno haoticno, i treba da
  * se udesi, bar napravi citljivijom i otklone pojedini bug-ovi
  * za sada radi i razresava kolizije OK za kockaste objekte */
-void movable::move(glm::vec3 moveVector) {
+void MovableObject::move(glm::vec3 moveVector) {
 
 	/* Provera da li objekat dolazi u koliziju sa bilo kojim
 	 * od objekata koje smo mu prosledili u checkColisionList */
 	// Potrebno ukljuciti dole na kraju funkcije //
 	int numOfColidingY = 0;
 
-	for_each (checkColisionList.begin(), checkColisionList.end(), [&numOfColidingY,this, &moveVector] (object * o) {
+	for_each (checkColisionList.begin(), checkColisionList.end(), [&numOfColidingY,this, &moveVector] (Object * o) {
 
 		if (this->isColiding(o)) {
 
@@ -197,7 +197,7 @@ void movable::move(glm::vec3 moveVector) {
 
 
 
-void movable::rotateUpKeys(bool pressedKeys[256]) {
+void MovableObject::rotateUpKeys(bool pressedKeys[256]) {
 
 	float keyRotationSensitivity = keyboardObj.keyRotationSensitivity;
 
@@ -213,7 +213,7 @@ void movable::rotateUpKeys(bool pressedKeys[256]) {
 		this->rotate(rotateUp, glm::vec3(1,0,0));
 }
 
-void movable::rotateLeftKeys(bool pressedKeys[256]) {
+void MovableObject::rotateLeftKeys(bool pressedKeys[256]) {
 
 	float rotateLeft=0.0f;
 	float keyRotationSensitivity = keyboardObj.keyRotationSensitivity;
@@ -228,7 +228,7 @@ void movable::rotateLeftKeys(bool pressedKeys[256]) {
 		this->rotate(rotateLeft, glm::vec3(0,1,0));
 }
 
-void movable::jumpKeys(bool pressedKeys[256]) {
+void MovableObject::jumpKeys(bool pressedKeys[256]) {
 
 	if (pressedKeys[keybindings.jumpKey]) {
 		if (this->isOnGround) {
@@ -238,19 +238,19 @@ void movable::jumpKeys(bool pressedKeys[256]) {
 	}
 }
 
-void movable::rotateMouse(glm::vec2 delta) {
+void MovableObject::rotateMouse(glm::vec2 delta) {
 	float mouseRotationSensitivity = mouseObj.sensitivity;
 	this->rotate(delta.x*mouseRotationSensitivity, glm::vec3(0,1,0));
 	this->rotate(delta.y*mouseRotationSensitivity, glm::vec3(1,0,0));
 }
 
-void movable::addToVelocity(glm::vec3 addVec) {
+void MovableObject::addToVelocity(glm::vec3 addVec) {
 	this->velocity += addVec;
 }
-void movable::setVelocity(glm::vec3 velocity) {
+void MovableObject::setVelocity(glm::vec3 velocity) {
 	this->velocity = velocity;
 }
-glm::vec3 movable::getVelocity() {
+glm::vec3 MovableObject::getVelocity() {
 	return this->velocity;
 }
 

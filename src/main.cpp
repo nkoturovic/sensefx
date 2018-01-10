@@ -14,26 +14,26 @@
 #include <glm/gtc/type_ptr.hpp>
 
 /* HELPERS */
-#include "dataContainer.h"
-#include "config.h"
+#include "DataContainer.h"
+#include "Config.h"
 
 /* OBJECT */
-#include "object.h"
-#include "drawable.h"
-#include "movable.h"
-#include "user.h"
+#include "Object.h"
+#include "DrawableObject.h"
+#include "MovableObject.h"
+#include "User.h"
 #include "math_objects.h"
 #include "various_objects.h"
 
 /* CAMERA */
-#include "camera.h"
+#include "Camera.h"
 
 using namespace std;
 
 /* Ovde se nalaze svi podaci koji
  * se dele izmedju funkcija
  * (umesto globalnih promenljivih) */
-dataContainer globalData;
+DataContainer globalData;
 
 /* CALLBACK-ovi */
 static void on_display();
@@ -51,8 +51,8 @@ static void gravity_timer(int value);
 
 int main(int argc, char * argv[])
 {
-	globalData.configs = config::importAll("configs", "DEVELOPMENT");
-	config appConfig = globalData.configs["application"];
+	globalData.configs = Config::importAll("configs", "DEVELOPMENT");
+	Config appConfig = globalData.configs["application"];
 
 	glutInit(&argc, argv);
 	int dflWidth = std::stoi(appConfig.getParameter("WIN_WIDTH"));
@@ -80,18 +80,18 @@ int main(int argc, char * argv[])
 	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
 
 	/* Liste (vektori) objekata koji se prosledjuju callback funkcijama i tajmerima */
-	std::vector<object*> &objectsToDisplay = globalData.objectsToDisplay;
-	std::vector<object*> &objectsToKeyboard = globalData.objectsToKeyboard;
-	std::vector<object*> &objectsToMouseMove = globalData.objectsToMouseMove;
-	std::vector<object*> &objectsToGravity = globalData.objectsToGravity;
+	std::vector<Object*> &objectsToDisplay = globalData.objectsToDisplay;
+	std::vector<Object*> &objectsToKeyboard = globalData.objectsToKeyboard;
+	std::vector<Object*> &objectsToMouseMove = globalData.objectsToMouseMove;
+	std::vector<Object*> &objectsToGravity = globalData.objectsToGravity;
 	
 	/* Ispod je dat primer test (demo) programa */
-	wireCube floor1;
-	grid floor1Grid(12*4);
+	WireCube floor1;
+	Grid floor1Grid(12*4);
 	floor1Grid.translate(glm::vec3(0.0f,0.9f,0.0f));
 	floor1Grid.fill = true;
 	floor1.addChild(&floor1Grid);
-	axis originCs;
+	Axis originCs;
 	originCs.scale(glm::vec3(4.0f,4.0f,4.0f));
 	objectsToDisplay.push_back(&originCs);
 	
@@ -99,21 +99,21 @@ int main(int argc, char * argv[])
 	floor1.scale(glm::vec3(4.0f,0.5f,4.0f));
 	objectsToDisplay.push_back(&floor1);
 
-	user sampleUser;
+	User sampleUser;
 	sampleUser.addToCheckColisionList(&floor1);
 	sampleUser.translate(glm::vec3(0,4,0));
 
 	objectsToDisplay.push_back(&sampleUser);
 	globalData.activeCamera = sampleUser.fpsViewCamera();
 
-	axis cameracs(5);
+	Axis cameracs(5);
 
 	objectsToKeyboard.push_back(&sampleUser);
 	objectsToMouseMove.push_back(&sampleUser);
 	objectsToGravity.push_back(&sampleUser);
 
-	wireCube cubes[65];
-	grid topOfCube;
+	WireCube cubes[65];
+	Grid topOfCube;
 	topOfCube.fill = true;
 	topOfCube.translate(glm::vec3(0,0.86f,0));
 	int i;
@@ -126,8 +126,8 @@ int main(int argc, char * argv[])
 		cubes[i].addChild(&topOfCube);
 	}
 
-	grid floor2Grid(12*4);
-	wireCube floor2;
+	Grid floor2Grid(12*4);
+	WireCube floor2;
 	sampleUser.addToCheckColisionList(&floor2);
 	floor2Grid.translate(glm::vec3(0.0f,0.9f,0.0f));
 	floor2Grid.fill= true;
@@ -159,9 +159,9 @@ static void on_display()
 	//gluLookAt(0.2, 0.2, 0.2, 0, 0.2, 0, 0, 1, 0);
 	
 	/* Iscrtavanje objekata */
-	std::vector<object* > &objectsToDisplay = globalData.objectsToDisplay;
-	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [objectsToDisplay] (object * o) {
-		if(drawable * d_o = dynamic_cast<drawable*>(o))
+	std::vector<Object* > &objectsToDisplay = globalData.objectsToDisplay;
+	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [objectsToDisplay] (Object * o) {
+		if(DrawableObject * d_o = dynamic_cast<DrawableObject*>(o))
 			d_o->draw();
 	});
 
@@ -218,9 +218,9 @@ static void keyboard_timer(int value)
 		return;
 
 	/* TODO: Obradjivanje zahteva tastature, ne bi trebalo ovde da stoje verovatno!!! */
-	std::vector<object* > &objectsToKeyboard = globalData.objectsToKeyboard;
-	for_each (objectsToKeyboard.begin(), objectsToKeyboard.end(), [] (object * o) {
-		if(movable* m_o = dynamic_cast<movable*>(o))
+	std::vector<Object* > &objectsToKeyboard = globalData.objectsToKeyboard;
+	for_each (objectsToKeyboard.begin(), objectsToKeyboard.end(), [] (Object * o) {
+		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o))
 			m_o->processKeyboardInput(globalData.pressedKeys, globalData.keyPressedPositionX, globalData.keyPressedPositionY);
 	});
 
@@ -240,9 +240,9 @@ static void mouse_timer(int value)
 
 	glm::vec2 delta = center-mousePosition;
 
-	std::vector<object* > &objectsToMouseMove = globalData.objectsToMouseMove;
-	for_each (objectsToMouseMove.begin(), objectsToMouseMove.end(), [delta] (object * o) {
-		if(movable* m_o = dynamic_cast<movable*>(o)) 
+	std::vector<Object* > &objectsToMouseMove = globalData.objectsToMouseMove;
+	for_each (objectsToMouseMove.begin(), objectsToMouseMove.end(), [delta] (Object * o) {
+		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o)) 
 			m_o->processMouseMove(delta);
 	});
 
@@ -256,9 +256,9 @@ static void gravity_timer(int value)
 	if (value != globalData.gravityTimerId)
 		return;
 
-	std::vector<object* > &toGravity = globalData.objectsToGravity;
-	for_each (toGravity.begin(), toGravity.end(), [] (object * o) {
-		if(movable* m_o = dynamic_cast<movable*>(o)) {
+	std::vector<Object* > &toGravity = globalData.objectsToGravity;
+	for_each (toGravity.begin(), toGravity.end(), [] (Object * o) {
+		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o)) {
 			m_o->addToVelocity(glm::vec3(0.0f, -0.005, 0.0f));
 			m_o->move(m_o->getVelocity());
 		}

@@ -1,8 +1,8 @@
-#include "colidable.h"
+#include "ColidableObject.h"
 
 #include <algorithm>
 
-bool colidable::isColiding(object * obj) {
+bool ColidableObject::isColiding(Object * obj) {
 	
 	/* Ideja je da pogledamo da li se ivice prve kocke nalaze
 	 * u drugoj kocki i obtatno ivice druge u prvoj, prva/druga kocka 
@@ -88,11 +88,11 @@ bool colidable::isColiding(object * obj) {
 	return false;
 }
 
-void colidable::addToCheckColisionList(object * o) {
+void ColidableObject::addToCheckColisionList(Object * o) {
 	checkColisionList.push_back(o);
 }
 
-void colidable::removeFromCheckColisionList(object * o) {
+void ColidableObject::removeFromCheckColisionList(Object * o) {
 	checkColisionList.erase(
 		std::remove(checkColisionList.begin(), checkColisionList.end(), o), checkColisionList.end());
 }

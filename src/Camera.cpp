@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "Camera.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
@@ -6,10 +6,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-camera::camera(object * attachTo) : matrix(1.0f), attachedTo(attachTo) {}
-camera::camera() : camera(NULL) {}
+Camera::Camera(Object * attachTo) : matrix(1.0f), attachedTo(attachTo) {}
+Camera::Camera() : Camera(NULL) {}
 
-glm::mat4 camera::viewMatrix() {
+glm::mat4 Camera::viewMatrix() {
 	if (this->attachedTo == NULL) {
 		return glm::inverse(this->matrix);
 	}

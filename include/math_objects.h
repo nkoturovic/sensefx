@@ -1,26 +1,26 @@
 #ifndef SENSEFX_MATH_OBJECTS_H
 #define SENSEFX_MATH_OBJECTS_H
 
-#include "object.h"
-#include "drawable.h"
-#include "transformable.h"
+#include "Object.h"
+#include "DrawableObject.h"
+#include "TransformableObject.h"
 
-class axis : public drawable, public transformable {
+class Axis : public DrawableObject, public TransformableObject {
 
 	private:
 		int numOfUnits = 5;
 
 	public:
 
-		axis(object * parent, int numOfUnits);
-		axis(int numOfUnits);
-		axis();
+		Axis(Object * parent, int numOfUnits);
+		Axis(int numOfUnits);
+		Axis();
 
 		void drawObject();
 };
 
 
-class grid : public drawable, public transformable {
+class Grid : public DrawableObject, public TransformableObject {
 
 	private:
 		int numOfUnits = 5;
@@ -28,29 +28,29 @@ class grid : public drawable, public transformable {
 	public:
 		bool fill = false;
 
-		grid(object * parent, int numOfUnits);
-		grid(int numOfUnits);
-		grid();
+		Grid(Object * parent, int numOfUnits);
+		Grid(int numOfUnits);
+		Grid();
 
 		void drawObject();
 };
 
-class wireCube : public drawable, public transformable {
+class WireCube : public DrawableObject, public TransformableObject {
 
 	public:
-		wireCube(object * parent);
-		wireCube();
+		WireCube(Object * parent);
+		WireCube();
 
 		void drawObject();
 };
 
 
-class plane : public drawable, public transformable {
+class Plane : public DrawableObject, public TransformableObject {
 
 	public:
 		bool drawMaterial = true;
-		plane(object * parent);
-		plane();
+		Plane(Object * parent);
+		Plane();
 
 		void drawObject();
 };

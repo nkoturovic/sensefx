@@ -1,9 +1,9 @@
 #ifndef SENSEFX_DRAWABLE_H
 #define SENSEFX_DRAWABLE_H
 
-#include "object.h"
+#include "Object.h"
 
-class drawable : public virtual object {
+class DrawableObject : public virtual Object {
 
 	public:
 		/* Ovaj metod mora da ima svaki drawable

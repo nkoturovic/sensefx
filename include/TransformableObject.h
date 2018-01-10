@@ -1,9 +1,9 @@
 #ifndef SENSEFX_TRANSFORMABLE_H
 #define SENSEFX_TRANSFORMABLE_H
 
-#include "object.h"
+#include "Object.h"
 
-class transformable : public virtual object {
+class TransformableObject : public virtual Object {
 
 	public:
 		void translate(glm::vec3 translateVec);

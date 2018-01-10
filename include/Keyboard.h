@@ -1,12 +1,12 @@
 #ifndef SENSEFX_KEYBOARD_H
 #define SENSEFX_KEYBOARD_H
 
-#include "config.h"
+#include "Config.h"
 
-class keyboard {
+class Keyboard {
 
 	private:
-		void init(config keyBindings); 
+		void init(Config keyBindings); 
 
 	public:
 		float keyRotationSensitivity;
@@ -22,8 +22,8 @@ class keyboard {
 		unsigned char rotateLeftKey;
 		unsigned char rotateRightKey;
 
-		keyboard(config keyBindings);
-		keyboard();
+		Keyboard(Config keyBindings);
+		Keyboard();
 };
 
 #endif

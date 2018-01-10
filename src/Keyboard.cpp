@@ -1,7 +1,7 @@
-#include "keyboard.h"
-#include "config.h"
+#include "Keyboard.h"
+#include "Config.h"
 
-void keyboard::init (config keyBindings) {
+void Keyboard::init (Config keyBindings) {
 	moveForwardKey = keyBindings.getParameter("MOVE_FORWARD").c_str()[0];
 	moveBackKey = keyBindings.getParameter("MOVE_BACK").c_str()[0];
 	moveLeftKey = keyBindings.getParameter("MOVE_LEFT").c_str()[0];
@@ -16,11 +16,11 @@ void keyboard::init (config keyBindings) {
 	rotateRightKey = keyBindings.getParameter("ROTATE_RIGHT_KEY").c_str()[0];
 }
 
-keyboard::keyboard(config keyBindings) {
+Keyboard::Keyboard(Config keyBindings) {
 	init(keyBindings);
 }
 
-keyboard::keyboard() {
-	config defaultCfg("./configs/keyboard.cfg");
+Keyboard::Keyboard() {
+	Config defaultCfg("./configs/keyboard.cfg");
 	init(defaultCfg);
 };

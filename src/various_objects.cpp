@@ -1,5 +1,5 @@
 #include "various_objects.h"
-#include "object.h"
+#include "Object.h"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -13,12 +13,12 @@
  * koriste za testiranje i demonstraciju */
 
 
-chessFloor::chessFloor(object * parent, int numOfUnits) : object(parent), numOfUnits(numOfUnits) { }
-chessFloor::chessFloor(object * parent) : chessFloor(parent, 10){ }
-chessFloor::chessFloor(int numOfUnits) : chessFloor(NULL, numOfUnits) { }
-chessFloor::chessFloor() : chessFloor(NULL, 10){ }
+ChessFloor::ChessFloor(Object * parent, int numOfUnits) : Object(parent), numOfUnits(numOfUnits) { }
+ChessFloor::ChessFloor(Object * parent) : ChessFloor(parent, 10){ }
+ChessFloor::ChessFloor(int numOfUnits) : ChessFloor(NULL, numOfUnits) { }
+ChessFloor::ChessFloor() : ChessFloor(NULL, 10){ }
 
-void chessFloor::drawObject() {
+void ChessFloor::drawObject() {
 
 	float coef = 1.0f/numOfUnits;
 	glTranslatef(-coef,0,-coef);
@@ -35,10 +35,10 @@ void chessFloor::drawObject() {
 		}
 		glPopMatrix();
 	}
-	
+
 }
 
-void chessFloor::drawChessSingleTexture() {
+void ChessFloor::drawChessSingleTexture() {
 
 	glPushMatrix();
 		glColor3f(0.1,0.1,0.1);
@@ -83,12 +83,12 @@ void chessFloor::drawChessSingleTexture() {
 		glPopMatrix();
 }
 
-triangleFloor::triangleFloor(object * parent, int numOfUnits) : object(parent), numOfUnits(numOfUnits) { }
-triangleFloor::triangleFloor(object * parent) : triangleFloor(parent, 10){ }
-triangleFloor::triangleFloor(int numOfUnits) : triangleFloor(NULL, numOfUnits) { }
-triangleFloor::triangleFloor() : triangleFloor(NULL, 10){ }
+TriangleFloor::TriangleFloor(Object * parent, int numOfUnits) : Object(parent), numOfUnits(numOfUnits) { }
+TriangleFloor::TriangleFloor(Object * parent) : TriangleFloor(parent, 10){ }
+TriangleFloor::TriangleFloor(int numOfUnits) : TriangleFloor(NULL, numOfUnits) { }
+TriangleFloor::TriangleFloor() : TriangleFloor(NULL, 10){ }
 
-void triangleFloor::drawObject() {
+void TriangleFloor::drawObject() {
 	float coef = 1.0f/numOfUnits;
 	glTranslatef(-coef,0,-coef);
 	glTranslatef(-1,0,-1);
@@ -105,7 +105,7 @@ void triangleFloor::drawObject() {
 	}
 }
 
-void triangleFloor::drawtriangleSingleTexture() {
+void TriangleFloor::drawtriangleSingleTexture() {
 
 	glPushMatrix();
 

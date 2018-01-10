@@ -3,26 +3,26 @@
 
 #include <vector>
 #include <map>
-#include "config.h"
-#include "object.h"
-#include "camera.h"
+#include "Config.h"
+#include "Object.h"
+#include "Camera.h"
 
-class dataContainer {
+class DataContainer {
 	public:
 		/* Zamena za globalne promenljive, klasa
 		 * container sadrzi liste objekata 
 		 * koje treba proslediti funkcijama on_*
 		 * da ih obrade. */
 
-		/* configs map */
-		std::map<std::string, config> configs;
+		/* Configs map */
+		std::map<std::string, Config> configs;
 
-		std::vector <object*> objectsToDisplay;
-		std::vector <object*> objectsToKeyboard; 
-		std::vector <object*> objectsToMouseMove;
-		std::vector <object*> objectsToGravity;
+		std::vector <Object*> objectsToDisplay;
+		std::vector <Object*> objectsToKeyboard; 
+		std::vector <Object*> objectsToMouseMove;
+		std::vector <Object*> objectsToGravity;
 
-		camera * activeCamera;
+		Camera * activeCamera;
 
 		bool pressedKeys[256];
 		int keyPressedPositionX;

@@ -1,4 +1,4 @@
-#include "object.h"
+#include "Object.h"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -10,23 +10,23 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-object::object(object * parent) {
+Object::Object(Object * parent) {
 	if (parent != NULL)
 		parent->addChild(this);
 }
 
-object::object() {
+Object::Object() {
 }
 
-object::~object() { }
+Object::~Object() { }
 
-void object::addChild(object * o) {
+void Object::addChild(Object * o) {
 	o->parent = this;
 	children.push_back(o);
 }
 
-glm::mat4 object::transformationMatrix() {
-	object * tmp_ptr = this;
+glm::mat4 Object::transformationMatrix() {
+	Object * tmp_ptr = this;
 	glm::mat4 result_matrix(1.0f);
 
 	while (tmp_ptr != NULL) {
@@ -37,11 +37,11 @@ glm::mat4 object::transformationMatrix() {
 	return result_matrix;
 }
 
-void object::setNoParent() {
+void Object::setNoParent() {
 	setParent(NULL);
 }
 
-void object::setParent(object * parent) {
+void Object::setParent(Object * parent) {
 
 	this->parent = parent;
 
@@ -49,7 +49,7 @@ void object::setParent(object * parent) {
 		parent->addChild(this);
 }
 
-glm::vec3 object::pointToObjectSys(glm::vec3 worldVec) {
+glm::vec3 Object::pointToObjectSys(glm::vec3 worldVec) {
 	glm::mat4 transMat = transformationMatrix();
 	glm::mat4 inverse = glm::inverse(transMat);
 	glm::vec4 worldVec4(worldVec.x, worldVec.y, worldVec.z, 1.0f);
@@ -59,7 +59,7 @@ glm::vec3 object::pointToObjectSys(glm::vec3 worldVec) {
 	return glm::vec3(resultVec4.x/w, resultVec4.y/w, resultVec4.z/w);
 }
 
-glm::vec3 object::vecToObjectSys(glm::vec3 worldVec) {
+glm::vec3 Object::vecToObjectSys(glm::vec3 worldVec) {
 	glm::mat4 transMat = transformationMatrix();
 	glm::mat4 inverse = glm::inverse(transMat);
 	glm::vec4 worldVec4(worldVec.x, worldVec.y, worldVec.z, 1.0f);
@@ -75,14 +75,14 @@ glm::vec3 object::vecToObjectSys(glm::vec3 worldVec) {
 	return resultVec3 - resultOrigin3;
 }
 
-glm::vec3 object::pointToObjectSys(object * fromObj, glm::vec3 fromObjVec) {
+glm::vec3 Object::pointToObjectSys(Object * fromObj, glm::vec3 fromObjVec) {
 	glm::vec4 tmpVec4(fromObjVec.x, fromObjVec.y, fromObjVec.z, 1.0f);
 	glm::vec4 resultVec4 = fromObj->transformationMatrix(this)*tmpVec4;
 	float w = resultVec4.w;
 	return glm::vec3(resultVec4.x/w, resultVec4.y/w, resultVec4.z/w);
 }
 
-glm::vec3 object::vecToObjectSys(object * fromObj, glm::vec3 fromObjVec) {
+glm::vec3 Object::vecToObjectSys(Object * fromObj, glm::vec3 fromObjVec) {
 	glm::mat4 tm = fromObj->transformationMatrix(this);
 	glm::vec4 tmpVec4(fromObjVec.x, fromObjVec.y, fromObjVec.z, 1.0f);
 	glm::vec4 resultVec4 = tm*tmpVec4;
@@ -96,7 +96,7 @@ glm::vec3 object::vecToObjectSys(object * fromObj, glm::vec3 fromObjVec) {
 	return  resultVec3 - resultOriginVec3;
 }
 
-glm::vec3 object::pointToWorldSys(glm::vec3 objVec) {
+glm::vec3 Object::pointToWorldSys(glm::vec3 objVec) {
 	glm::vec4 worldVec4(objVec.x, objVec.y, objVec.z, 1.0f);
 	glm::mat4 transMat = transformationMatrix();
 	glm::vec4 resultVec4 = transMat*worldVec4;
@@ -105,7 +105,7 @@ glm::vec3 object::pointToWorldSys(glm::vec3 objVec) {
 	return glm::vec3(resultVec4.x/w, resultVec4.y/w, resultVec4.z/w);
 }
 
-glm::vec3 object::vecToWorldSys(glm::vec3 objVec) {
+glm::vec3 Object::vecToWorldSys(glm::vec3 objVec) {
 	glm::vec4 worldVec4(objVec.x, objVec.y, objVec.z, 1.0f);
 	glm::mat4 transMat = transformationMatrix();
 	glm::vec4 resultVec4 = transMat*worldVec4;
@@ -118,7 +118,7 @@ glm::vec3 object::vecToWorldSys(glm::vec3 objVec) {
 	return resultVec3 - resultOriginVec3;
 }
 
-glm::mat4 object::transformationMatrix(object * obj2 ) {
+glm::mat4 Object::transformationMatrix(Object * obj2 ) {
 
 	/* Mnozenje sa ovom daje world */
 	glm::mat4 transMat1 = this->transformationMatrix();
@@ -127,11 +127,11 @@ glm::mat4 object::transformationMatrix(object * obj2 ) {
 	return transMat2*transMat1;
 }
 
-glm::mat4 object::getPositioningMatrix() {
+glm::mat4 Object::getPositioningMatrix() {
 	return this->positioningMatrix;
 }
 
 
-void object::setPositioningMatrix(glm::mat4 positioningMatrix) {
+void Object::setPositioningMatrix(glm::mat4 positioningMatrix) {
 	this->positioningMatrix = positioningMatrix;
 }

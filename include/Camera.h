@@ -1,18 +1,18 @@
 #ifndef SENSEFX_CAMERA_H
 #define SENSEFX_CAMERA_H
 
-#include "object.h"
+#include "Object.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class camera {
+class Camera {
 
 	public:
 		glm::mat4 matrix;
-		camera();
-		camera(object * attachTo);
+		Camera();
+		Camera(Object * attachTo);
 
-		object * attachedTo = NULL;
+		Object * attachedTo = NULL;
 
 		glm::mat4 viewMatrix();
 };

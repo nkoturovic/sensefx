@@ -1,5 +1,5 @@
-#include "user.h"
-#include "object.h"
+#include "User.h"
+#include "Object.h"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -7,22 +7,22 @@
 
 #include <glm/glm.hpp>
 
-head::head() {
+Head::Head() {
 	this->firstPerson.attachedTo = this;
 }
 
-user::user(object * parent, float speed, float jump) : object(parent), movable(speed,jump) {
+User::User(Object * parent, float speed, float jump) : Object(parent), MovableObject(speed,jump) {
 	scale(userToWorldRatio);
 	userHead.setParent(this);
 	userHead.translate(glm::vec3(0.0f,0.84f,0.0f));
 	userHead.scale(headToBodyRatio);
 }
 
-user::user(float speed, float jump) : user(NULL, speed, jump) {}
-user::user() : user(NULL, 0.25, 0.15) {}
+User::User(float speed, float jump) : User(NULL, speed, jump) {}
+User::User() : User(NULL, 0.25, 0.15) {}
 
 
-void head::processKeyboardInput(bool pressedKeys[256], int x, int y) {
+void Head::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
 	/* Data funkcija proverava da li je vertikalna rotacija
 	 * veca od 90 stepeni, ako jeste nece se rotirati dalje
@@ -54,7 +54,7 @@ void head::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 	rotateUpKeys(pressedKeys);
 }
 
-void head::processMouseMove(glm::vec2 delta) {
+void Head::processMouseMove(glm::vec2 delta) {
 
 	float mouseRotationSensitivity = this->mouseObj.sensitivity;
 
@@ -74,7 +74,7 @@ void head::processMouseMove(glm::vec2 delta) {
 	rotateMouse(glm::vec2(0.0f,delta.y));
 }
 
-void user::processKeyboardInput(bool pressedKeys[256], int x, int y) {
+void User::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 
 	moveKeys(pressedKeys);
 	rotateLeftKeys(pressedKeys);
@@ -83,18 +83,18 @@ void user::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 	this->userHead.processKeyboardInput(pressedKeys, x, y);
 }
 
-void user::processMouseMove(glm::vec2 delta) {
+void User::processMouseMove(glm::vec2 delta) {
 	rotateMouse(glm::vec2(delta.x,0.0f));
 	this->userHead.processMouseMove(glm::vec2(0.0f, delta.y));
 }
 
-void head::drawObject(){
+void Head::drawObject(){
 }
 
 
-void user::drawObject() {
+void User::drawObject() {
 }
 
-camera * user::fpsViewCamera() {
+Camera * User::fpsViewCamera() {
 	return &this->userHead.firstPerson;
 }

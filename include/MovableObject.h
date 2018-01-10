@@ -1,13 +1,13 @@
 #ifndef SENSEFX_MOVEABLE_H
 #define SENSEFX_MOVEABLE_H
 
-#include "object.h"
-#include "transformable.h"
-#include "colidable.h"
-#include "keyboard.h"
-#include "mouse.h"
+#include "Object.h"
+#include "TransformableObject.h"
+#include "ColidableObject.h"
+#include "Keyboard.h"
+#include "Mouse.h"
 
-class movable : public transformable, public colidable {
+class MovableObject : public TransformableObject, public ColidableObject {
 
 	private:
 		/* Velocity je trenutna brzina objekta,
@@ -19,12 +19,12 @@ class movable : public transformable, public colidable {
 
 	public:
 
-		keyboard keyboardObj;
-		keyboard &keybindings = keyboardObj;
-		mouse mouseObj;
+		Keyboard keyboardObj;
+		Keyboard &keybindings = keyboardObj;
+		Mouse mouseObj;
 
-		movable(float speed, float jump);
-		movable();
+		MovableObject(float speed, float jump);
+		MovableObject();
 
 		/* Svaki metod koji je movable mora da implementira
 		 * procesuiranje zahteva poslatih sa tastature */

@@ -1,11 +1,11 @@
-#include "config.h"
+#include "Config.h"
 #include <fstream>
 #include <regex>
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem;
 
-config::config(std::string path, std::string mode) : path(path), mode(mode) {
+Config::Config(std::string path, std::string mode) : path(path), mode(mode) {
     std::ifstream f(path);
     const std::regex regMode("^(\\[%([A-Z]+?)%\\])$");
     const std::regex regParam("^([A-Z_]+?)\\=(.+?)$");
@@ -23,15 +23,15 @@ config::config(std::string path, std::string mode) : path(path), mode(mode) {
     }
 }
 
-config::config(std::string path) : config(path, "DEFAULT") {}
-config::config() : config("", "DEFAULT") {}
+Config::Config(std::string path) : Config(path, "DEFAULT") {}
+Config::Config() : Config("", "DEFAULT") {}
 
-std::string config::getParameter(std::string key) {
+std::string Config::getParameter(std::string key) {
     return this->parameters[key];
 }
 
-std::map<std::string, config> config::importAll(std::string dirPath, std::string mode) {
-    std::map<std::string, config> confMap;
+std::map<std::string, Config> Config::importAll(std::string dirPath, std::string mode) {
+    std::map<std::string, Config> confMap;
 
     const std::regex regConf(".*?([^\\/]+)\\.cfg", std::regex_constants::icase);
     std::smatch match;
@@ -45,7 +45,7 @@ std::map<std::string, config> config::importAll(std::string dirPath, std::string
 
         if (std::regex_search(filePath, match, regConf)) {
             confName = match[1];
-            config conf(filePath, mode);
+            Config conf(filePath, mode);
             confMap[confName] = conf;
         }
     }
@@ -54,6 +54,6 @@ std::map<std::string, config> config::importAll(std::string dirPath, std::string
 }
 
 
-std::map<std::string, config> config::importAll(std::string dirPath) {
+std::map<std::string, Config> Config::importAll(std::string dirPath) {
     return importAll(dirPath, "DEFAULT");
 }

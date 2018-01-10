@@ -1,4 +1,4 @@
-#include "object.h"
+#include "Object.h"
 #include "math_objects.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -6,11 +6,11 @@
 
 
 /* ######### GRID ######### */
-grid::grid(object * parent, int numOfUnits) : object(parent), numOfUnits(numOfUnits) {}
-grid::grid(int numOfUnits) : grid(NULL, numOfUnits) {}
-grid::grid() : grid(NULL, 10) {}
+Grid::Grid(Object * parent, int numOfUnits) : Object(parent), numOfUnits(numOfUnits) {}
+Grid::Grid(int numOfUnits) : Grid(NULL, numOfUnits) {}
+Grid::Grid() : Grid(NULL, 10) {}
 
-void grid::drawObject() {
+void Grid::drawObject() {
 
 	if (fill) {
 		glPushMatrix();
@@ -38,10 +38,10 @@ void grid::drawObject() {
 		glEnd();
 }
  
-wireCube::wireCube(object * parent) : object(parent) {}
-wireCube::wireCube() : wireCube(NULL){}
+WireCube::WireCube(Object * parent) : Object(parent) {}
+WireCube::WireCube() : WireCube(NULL){}
 
-void wireCube::drawObject() {
+void WireCube::drawObject() {
 	glColor3f(0,1,0);
 	glBegin(GL_LINE_STRIP);
 		glVertex3f(-1,-1,-1);
@@ -71,11 +71,11 @@ void wireCube::drawObject() {
 
 
 /* ######### AXIS ######### */
-axis::axis(object * parent, int numOfUnits) : object(parent), numOfUnits(numOfUnits) {}
-axis::axis(int numOfUnits) : axis(NULL, numOfUnits) {}
-axis::axis() : axis(NULL, 5) {}
+Axis::Axis(Object * parent, int numOfUnits) : Object(parent), numOfUnits(numOfUnits) {}
+Axis::Axis(int numOfUnits) : Axis(NULL, numOfUnits) {}
+Axis::Axis() : Axis(NULL, 5) {}
 
-void axis::drawObject() {
+void Axis::drawObject() {
 
 	glBegin(GL_LINES);
 		glColor3f(1, 0, 0);
@@ -109,10 +109,10 @@ void axis::drawObject() {
 }
  
 /* ######### PLANE ######### */
-plane::plane(object * parent) : object(parent) {}
-plane::plane() : plane(NULL) {}
+Plane::Plane(Object * parent) : Object(parent) {}
+Plane::Plane() : Plane(NULL) {}
 
-void plane::drawObject() {
+void Plane::drawObject() {
 	glBegin(GL_QUADS);
 		glColor3f(.55, .55, .55);
 		glBegin(GL_QUADS);
