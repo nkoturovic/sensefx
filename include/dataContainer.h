@@ -17,10 +17,10 @@ class dataContainer {
 		/* configs map */
 		std::map<std::string, config> configs;
 
-		std::vector <object*> toDisplay;
-		std::vector <object*> toKeyboard; 
-		std::vector <object*> toMouseMove;
-		std::vector <object*> toGravity;
+		std::vector <object*> objectsToDisplay;
+		std::vector <object*> objectsToKeyboard; 
+		std::vector <object*> objectsToMouseMove;
+		std::vector <object*> objectsToGravity;
 
 		camera * activeCamera;
 

@@ -5,13 +5,27 @@
 #include "camera.h"
 #include "movable.h"
 
+/* User u sebi sadrzi glavu koja moze da se rotira samo vertikalno
+ * glava je user-ovo dete i sve horizontalne rotacije user-a uticace na glavu. */
+
+/*
+-------------
+|   -----   |
+|   |HEAD|  |
+|   -----   |
+|           |
+|    USER   |
+|           |
+|___________|
+*/
+
+
 class head : public movable {
 
 	private:
 		float headRotated=0.0f;
 
 	public:
-
 		head();
 		camera firstPerson;
 		void processKeyboardInput(bool pressedKeys[256], int x, int y);

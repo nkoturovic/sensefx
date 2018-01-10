@@ -4,21 +4,18 @@
 #include <vector>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
-#include "keyboard.h"
-#include "mouse.h"
 
 class object {
 
 	private:
-		/* Matrica pozicije u odnosu na roditelja 
+		/* Matrica pozicije u odnosu na roditelja
 		 * (relativna pozicija u odnosu na roditelja) */
-		glm::mat4 positioningMatrix; 
+		glm::mat4 positioningMatrix;
 
 	protected:
 		std::vector <object*> children;
 
 	public:
-
 		object * parent = NULL;
 
 		object();
@@ -32,28 +29,24 @@ class object {
 		void setParent(object * parent);
 		void setNoParent();
 
-		/* Metodi point samo tacku menjaju, bez da od nje se oduzme 
-		 * polozaj koordinatnog pocetka (time bi se dobio
-		 * identican vektor u nasem sistemu) - a ovde se 
-		 * dobija polozaj "udajlene tacke" umesto bliskog
-		 * vektora */
+		/* Matrica koja transformise iz obj2 CS u this objects CS */
+		glm::mat4 transformationMatrix(object * obj2);
+		/* Matrica koja transformise iz WCS u this objects CS */
+		glm::mat4 transformationMatrix();
+
+		/* Metodi point samo tacku vracaju, bez da od nje se oduzme
+		 * polozaj koordinatnog pocetka starog repera (time bi se dobio
+		 * identican vektor u nasem sistemu) - a ovde se
+		 * dobija polozaj "udajlene tacke" u (this) reperu */
 		glm::vec3 pointToWorldSys(glm::vec3 objVec);
 		glm::vec3 pointToObjectSys(glm::vec3 worldVec);
 		glm::vec3 pointToObjectSys(object * fromObj, glm::vec3 fromObjVec);
 
-		/* Apsolutna matrica pozicioniranja u WCS - kada
-		 * se primene sve transformacije roditelja i napokon
-		 * datog objekta */
-		glm::mat4 transformationMatrix(object * obj2);
-		glm::mat4 transformationMatrix();
-
-		/* Funkcije ispod "analogno kopiraju vektor!!"
+		/* Funkcije "analogno kopiraju vektor!!"
 		 * pogledaj u isto mesto u koje ja gledam ume-
 		 * sto da gledas u mene (moju tacku) !!!
-		 * (uzima se u obzir koordinatni pocetak) */
-
-		/* Maksima - Pogledajte svi u istom pravcu umesto
-		 * pogledajte svi u istu tacku!!!!!! */
+		 * (uzima se u obzir koordinatni pocetak starog
+		 * repera - oduzima se od pozicije tacke) */
 		glm::vec3 vecToWorldSys(glm::vec3 objVec);
 		glm::vec3 vecToObjectSys(glm::vec3 worldVec);
 		glm::vec3 vecToObjectSys(object * fromObj, glm::vec3 fromObjVec);

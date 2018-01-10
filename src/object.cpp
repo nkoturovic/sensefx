@@ -3,7 +3,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#include <iostream>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>

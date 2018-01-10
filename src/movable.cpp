@@ -29,7 +29,11 @@ void movable::moveKeys(bool pressedKeys[256]) {
 
 }
 
+/* UPOZORENJE!! - Funkcija je napisana prilicno haoticno, i treba da
+ * se udesi, bar napravi citljivijom i otklone pojedini bug-ovi
+ * za sada radi i razresava kolizije OK za kockaste objekte */
 void movable::move(glm::vec3 moveVector) {
+
 	/* Provera da li objekat dolazi u koliziju sa bilo kojim
 	 * od objekata koje smo mu prosledili u checkColisionList */
 	// Potrebno ukljuciti dole na kraju funkcije //
