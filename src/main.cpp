@@ -28,6 +28,9 @@
 /* CAMERA */
 #include "Camera.h"
 
+/* TEXTURE2D */
+#include "Texture.h"
+
 using namespace std;
 
 /* Ovde se nalaze svi podaci koji
@@ -52,6 +55,7 @@ static void gravity_timer(int value);
 int main(int argc, char * argv[])
 {
 	globalData.configs = Config::importAll("configs", "DEVELOPMENT");
+
 	Config appConfig = globalData.configs["application"];
 
 	glutInit(&argc, argv);
@@ -79,13 +83,25 @@ int main(int argc, char * argv[])
 	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
 	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
 
+	/* Ukljucivanje tekstura */
+	glEnable(GL_TEXTURE_2D);
+
+	/* Podesava se rezim iscrtavanja tekstura tako da boje na teksturi
+	* potpuno odredjuju boju objekata. */
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+
 	/* Liste (vektori) objekata koji se prosledjuju callback funkcijama i tajmerima */
 	std::vector<Object*> &objectsToDisplay = globalData.objectsToDisplay;
 	std::vector<Object*> &objectsToKeyboard = globalData.objectsToKeyboard;
 	std::vector<Object*> &objectsToMouseMove = globalData.objectsToMouseMove;
 	std::vector<Object*> &objectsToGravity = globalData.objectsToGravity;
 	
-	/* Ispod je dat primer test (demo) programa */
+	/* IMPORT MORA NAKON UKLJUCIVANJA TEKSTURA!! */
+	globalData.textures = Texture2D::importAll("resources/textures");
+
+	/* Ispod je dat primer test (demo) program */
+
 	WireCube floor1;
 	Grid floor1Grid(12*4);
 	floor1Grid.translate(glm::vec3(0.0f,0.9f,0.0f));
@@ -139,6 +155,8 @@ int main(int argc, char * argv[])
 	floor2.scale(glm::vec3(4.0f,0.5f,4.0f));
 	objectsToDisplay.push_back(&floor2);
 
+	std::cout.flush();
+
 	glutMainLoop();
 
 	return 0;
@@ -157,14 +175,14 @@ static void on_display()
 	/* Postavljanje tacke gledista */
 	glLoadMatrixf(glm::value_ptr(globalData.activeCamera->viewMatrix()));
 	//gluLookAt(0.2, 0.2, 0.2, 0, 0.2, 0, 0, 1, 0);
-	
+
 	/* Iscrtavanje objekata */
 	std::vector<Object* > &objectsToDisplay = globalData.objectsToDisplay;
 	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [objectsToDisplay] (Object * o) {
 		if(DrawableObject * d_o = dynamic_cast<DrawableObject*>(o))
 			d_o->draw();
 	});
-
+	
 	glutSwapBuffers();
 }
 
@@ -202,8 +220,7 @@ static void on_mouse_move(int x, int y)
 }
 
 
-/* TAJMERI */
-static void redisplay_timer(int value)
+/* TAJMERI */ static void redisplay_timer(int value)
 {
 	if (value != globalData.redisplayTimerId)
 		return;

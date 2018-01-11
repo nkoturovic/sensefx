@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "Object.h"
 #include "Camera.h"
+#include "Texture.h"
 
 class DataContainer {
 	public:
@@ -16,6 +17,7 @@ class DataContainer {
 
 		/* Configs map */
 		std::map<std::string, Config> configs;
+		std::map<std::string, Texture2D> textures;
 
 		std::vector <Object*> objectsToDisplay;
 		std::vector <Object*> objectsToKeyboard; 

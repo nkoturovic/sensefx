@@ -1,5 +1,5 @@
-#ifndef SENSEFX_DRAWABLE_H
-#define SENSEFX_DRAWABLE_H
+#ifndef SENSEFX_DRAWABLE_OBJECT_H
+#define SENSEFX_DRAWABLE_OBJECT_H
 
 #include "Object.h"
 
@@ -16,4 +16,4 @@ class DrawableObject : public virtual Object {
 		void drawSurroundingGrid();
 };
 
-#endif //DRAWABLE
+#endif //DRAWABLE_OBJECT

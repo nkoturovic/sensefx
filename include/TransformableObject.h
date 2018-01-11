@@ -1,5 +1,5 @@
-#ifndef SENSEFX_TRANSFORMABLE_H
-#define SENSEFX_TRANSFORMABLE_H
+#ifndef SENSEFX_TRANSFORMABLE_OBJECT_H
+#define SENSEFX_TRANSFORMABLE_OBJECT_H
 
 #include "Object.h"
 
@@ -11,4 +11,4 @@ class TransformableObject : public virtual Object {
 		void scale(glm::vec3 scaleVec);
 };
 
-#endif //DRAWABLE
+#endif // TRANSFORMABLE_OBJECT

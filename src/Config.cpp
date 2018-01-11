@@ -24,7 +24,7 @@ Config::Config(std::string path, std::string mode) : path(path), mode(mode) {
 }
 
 Config::Config(std::string path) : Config(path, "DEFAULT") {}
-Config::Config() : Config("", "DEFAULT") {}
+Config::Config() { } 
 
 std::string Config::getParameter(std::string key) {
     return this->parameters[key];

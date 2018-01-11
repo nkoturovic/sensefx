@@ -1,5 +1,5 @@
-#ifndef SENSEFX_COLIDABLE_H
-#define SENSEFX_COLIDABLE_H
+#ifndef SENSEFX_COLIDABLE_OBJECT_H
+#define SENSEFX_COLIDABLE_OBJECT_H
 
 #include "Object.h"
 

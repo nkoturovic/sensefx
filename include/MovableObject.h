@@ -1,5 +1,5 @@
-#ifndef SENSEFX_MOVEABLE_H
-#define SENSEFX_MOVEABLE_H
+#ifndef SENSEFX_MOVEABLE_OBJECT_H
+#define SENSEFX_MOVEABLE_OBJECT_H
 
 #include "Object.h"
 #include "TransformableObject.h"
@@ -51,4 +51,4 @@ class MovableObject : public TransformableObject, public ColidableObject {
 		glm::vec3 getVelocity();
 };
 
-#endif //MOVABLE
+#endif //MOVABLE_OBJECT
