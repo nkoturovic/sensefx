@@ -5,7 +5,16 @@
 
 class DrawableObject : public virtual Object {
 
+	protected:
+		glm::vec4 color;
+
 	public:
+
+		DrawableObject();
+		DrawableObject(Object * parent);
+		DrawableObject(Object * parent, glm::vec4 color);
+		DrawableObject(glm::vec4 color);
+
 		/* Ovaj metod mora da ima svaki drawable
 		 * objekat, to predstavlja njegovu graficku
 		 * reprezentaciju */
@@ -14,6 +23,9 @@ class DrawableObject : public virtual Object {
 		void draw();
 		void drawChildren();
 		void drawSurroundingGrid();
+
+		glm::vec4 getColor();
+		void setColor(glm::vec4 color);
 };
 
 #endif //DRAWABLE_OBJECT

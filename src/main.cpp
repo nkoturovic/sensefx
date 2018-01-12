@@ -20,16 +20,23 @@
 /* OBJECT */
 #include "Object.h"
 #include "DrawableObject.h"
+#include "TexturedObject.h"
 #include "MovableObject.h"
 #include "User.h"
 #include "math_objects.h"
 #include "various_objects.h"
+#include "objloader.h"
+#include "Model.h"
 
 /* CAMERA */
 #include "Camera.h"
 
 /* TEXTURE2D */
 #include "Texture.h"
+#include "Material.h"
+
+#include "Light.h"
+
 
 using namespace std;
 
@@ -71,6 +78,7 @@ int main(int argc, char * argv[])
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
 	glEnable(GL_DEPTH_TEST);
 
+	/* Inicijalizacija callback-ova i tajmera */
 	glutDisplayFunc(on_display);
 	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(on_keyboard);
@@ -83,13 +91,21 @@ int main(int argc, char * argv[])
 	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
 	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
 
+	/* Normalizacija normala */
+	glEnable(GL_NORMALIZE);
+
+	/* Uklucivanje osvetljenja */
+	glEnable(GL_LIGHTING);
+
 	/* Ukljucivanje tekstura */
 	glEnable(GL_TEXTURE_2D);
 
 	/* Podesava se rezim iscrtavanja tekstura tako da boje na teksturi
 	* potpuno odredjuju boju objekata. */
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	// glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
+	/* Uticaj boje na materijal - boja na specular-no */
+	//glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
 
 	/* Liste (vektori) objekata koji se prosledjuju callback funkcijama i tajmerima */
 	std::vector<Object*> &objectsToDisplay = globalData.objectsToDisplay;
@@ -97,65 +113,61 @@ int main(int argc, char * argv[])
 	std::vector<Object*> &objectsToMouseMove = globalData.objectsToMouseMove;
 	std::vector<Object*> &objectsToGravity = globalData.objectsToGravity;
 	
-	/* IMPORT MORA NAKON UKLJUCIVANJA TEKSTURA!! */
+	/* IMPORT TEKSTURA MORA NAKON UKLJUCIVANJA TEKSTURA!! */
 	globalData.textures = Texture2D::importAll("resources/textures");
+	globalData.models = Model::importAll("resources/models");
+	globalData.materials = Material::importAll("resources/materials");
+	globalData.lights = Light::importAll("resources/lights");
 
+	globalData.lights["light1"].enable();
+
+	/*******************************************/
 	/* Ispod je dat primer test (demo) program */
-
-	WireCube floor1;
-	Grid floor1Grid(12*4);
-	floor1Grid.translate(glm::vec3(0.0f,0.9f,0.0f));
-	floor1Grid.fill = true;
-	floor1.addChild(&floor1Grid);
-	Axis originCs;
-	originCs.scale(glm::vec3(4.0f,4.0f,4.0f));
-	objectsToDisplay.push_back(&originCs);
-	
-	floor1.rotate(12, glm::vec3(-.5,0,0.5));
-	floor1.scale(glm::vec3(4.0f,0.5f,4.0f));
-	objectsToDisplay.push_back(&floor1);
+	/*******************************************/
 
 	User sampleUser;
-	sampleUser.addToCheckColisionList(&floor1);
+	//sampleUser.addToCheckColisionList(&floor1);
 	sampleUser.translate(glm::vec3(0,4,0));
+
+	Texture2D skyTex = Texture2D("resources/textures/sky.bmp", false, false);
+
+	TexturedObject sky(NULL, glm::vec4(0.3,0.3,0.3,1.0), globalData.models["cube"], globalData.materials["light"], skyTex);
+	sky.scale(glm::vec3(1000.0f,1000.0f,1000.0f));
+	objectsToDisplay.push_back(&sky);
+
+	TexturedObject floor(NULL, glm::vec4(0.3,0.3,0.3,1.0), globalData.models["cube"], globalData.materials["shiny"], globalData.textures["wall"]);
+	floor.scale(glm::vec3(10.0f, 10.0f, 10.0f));
+	floor.translate(glm::vec3(0,-0.95,0));
+	objectsToDisplay.push_back(&floor);
+
+	sampleUser.addToCheckColisionList(&floor);
 
 	objectsToDisplay.push_back(&sampleUser);
 	globalData.activeCamera = sampleUser.fpsViewCamera();
-
-	Axis cameracs(5);
-
 	objectsToKeyboard.push_back(&sampleUser);
 	objectsToMouseMove.push_back(&sampleUser);
 	objectsToGravity.push_back(&sampleUser);
 
-	WireCube cubes[65];
-	Grid topOfCube;
-	topOfCube.fill = true;
-	topOfCube.translate(glm::vec3(0,0.86f,0));
-	int i;
+	TexturedObject cubes[65];
+	int i = 0;
 	for (i=0; i<65; i++) {
+		cubes[i].texture = globalData.textures["wall"];
+		cubes[i].material = globalData.materials["shiny"];
+		cubes[i].model = globalData.models["cube"];
 		cubes[i].rotate((float)i/20.0f*180, glm::vec3(0,1,0));
 		cubes[i].translate(glm::vec3(i*0.15+5.3, i*0.3f, i*0.15+5.3));
-		cubes[i].scale(glm::vec3(1.0f, 0.21f, 1.0f));
+		//cubes[i].scale(glm::vec3(1.0f, 0.21f, 1.0f));
 		sampleUser.addToCheckColisionList(&cubes[i]);
 		objectsToDisplay.push_back(&cubes[i]);
-		cubes[i].addChild(&topOfCube);
 	}
 
-	Grid floor2Grid(12*4);
-	WireCube floor2;
-	sampleUser.addToCheckColisionList(&floor2);
-	floor2Grid.translate(glm::vec3(0.0f,0.9f,0.0f));
-	floor2Grid.fill= true;
-	floor2.addChild(&floor2Grid);
-
-	floor2.rotate((float)i/20.0f*180, glm::vec3(0,1,0));
-	floor2.translate(glm::vec3(i*0.15+3, i*0.25f, i*0.15+5.3));
-
-	floor2.scale(glm::vec3(4.0f,0.5f,4.0f));
-	objectsToDisplay.push_back(&floor2);
-
-	std::cout.flush();
+	TexturedObject floor1(NULL, glm::vec4(0.3,0.3,0.3,1.0), globalData.models["cube"], globalData.materials["shiny"], globalData.textures["wall"]);
+	floor1.translate(glm::vec3(0,-0.95,0));
+	floor1.scale(glm::vec3(10.0f, 10.0f, 10.0f));
+	floor1.rotate((float)i/20.0f*180, glm::vec3(0,1,0));
+	floor1.translate(glm::vec3(i*0.035, i*0.01f, i*0.035));
+	objectsToDisplay.push_back(&floor1);
+	sampleUser.addToCheckColisionList(&floor1);
 
 	glutMainLoop();
 
@@ -168,6 +180,9 @@ static void on_display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.08, 0.08, 0.17, 1); // Klasa color potrebna (mozda i ne)
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -191,7 +206,7 @@ static void on_reshape(int width, int height)
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60, (float) width/(float) height, 0.01f, 1500.0f);
+	gluPerspective(60, (float) width/(float) height, 0.01f, 2000.0f);
 }
 
 static void on_keyboard(unsigned char c, int x, int y)

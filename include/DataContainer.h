@@ -7,6 +7,9 @@
 #include "Object.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "Model.h"
+#include "Light.h"
+#include "Material.h"
 
 class DataContainer {
 	public:
@@ -18,6 +21,9 @@ class DataContainer {
 		/* Configs map */
 		std::map<std::string, Config> configs;
 		std::map<std::string, Texture2D> textures;
+		std::map<std::string, Model> models;
+		std::map<std::string, Material> materials;
+		std::map<std::string, Light> lights;
 
 		std::vector <Object*> objectsToDisplay;
 		std::vector <Object*> objectsToKeyboard; 
