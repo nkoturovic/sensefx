@@ -39,17 +39,14 @@ void DrawableObject::draw() {
 		/* Jos uvek ima bug za nejednako skalirane objekte */
 		/* Mozda bi bilo drugacije da se skalira sa glScale u draw-u ( verovatno bi) */
 		if(TexturedObject* t_o = dynamic_cast<TexturedObject*>(this)) {
-
 			if (t_o->texture.isRepeatingS() || t_o->texture.isRepeatingT()) {
-
 				/* Uzimamo scale iz matrice transformacija */
 				glm::vec3 scale, translation, skew; glm::quat rotation; glm::vec4 perspective;
-				glm::decompose(transformation, scale, rotation, translation, skew, perspective);
+				glm::decompose(this->transformationMatrix(), scale, rotation, translation, skew, perspective);
 
 				glMatrixMode(GL_TEXTURE);
 				glLoadIdentity();
 				glScalef(scale.x, scale.y, scale.z);
-
 			}
 		}
 

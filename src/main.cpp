@@ -124,51 +124,25 @@ int main(int argc, char * argv[])
 	/*******************************************/
 	/* Ispod je dat primer test (demo) program */
 	/*******************************************/
+	DataContainer &gd = globalData;
 
-	User sampleUser;
-	//sampleUser.addToCheckColisionList(&floor1);
-	sampleUser.translate(glm::vec3(0,4,0));
+	//Axis wcs(5);
+	//objectsToDisplay.push_back(&wcs);
 
-	Texture2D skyTex = Texture2D("resources/textures/sky.bmp", false, false);
+	Room room;
+	room.setDimensions(glm::vec3(20,3.55,20));
+	objectsToDisplay.push_back(&room);
 
-	TexturedObject sky(NULL, glm::vec4(0.3,0.3,0.3,1.0), globalData.models["cube"], globalData.materials["light"], skyTex);
-	sky.scale(glm::vec3(1000.0f,1000.0f,1000.0f));
-	objectsToDisplay.push_back(&sky);
+	User user;
+	user.translate(glm::vec3(0,5,-20));
+	user.addToCheckColisionList(room.getColisionList());
+	gd.activeCamera = user.fpsViewCamera();
 
-	TexturedObject floor(NULL, glm::vec4(0.3,0.3,0.3,1.0), globalData.models["cube"], globalData.materials["shiny"], globalData.textures["wall"]);
-	floor.scale(glm::vec3(10.0f, 10.0f, 10.0f));
-	floor.translate(glm::vec3(0,-0.95,0));
-	objectsToDisplay.push_back(&floor);
+	objectsToKeyboard.push_back(&user);
+	objectsToMouseMove.push_back(&user);
+	objectsToGravity.push_back(&user);
 
-	sampleUser.addToCheckColisionList(&floor);
-
-	objectsToDisplay.push_back(&sampleUser);
-	globalData.activeCamera = sampleUser.fpsViewCamera();
-	objectsToKeyboard.push_back(&sampleUser);
-	objectsToMouseMove.push_back(&sampleUser);
-	objectsToGravity.push_back(&sampleUser);
-
-	TexturedObject cubes[65];
-	int i = 0;
-	for (i=0; i<65; i++) {
-		cubes[i].texture = globalData.textures["wall"];
-		cubes[i].material = globalData.materials["shiny"];
-		cubes[i].model = globalData.models["cube"];
-		cubes[i].rotate((float)i/20.0f*180, glm::vec3(0,1,0));
-		cubes[i].translate(glm::vec3(i*0.15+5.3, i*0.3f, i*0.15+5.3));
-		//cubes[i].scale(glm::vec3(1.0f, 0.21f, 1.0f));
-		sampleUser.addToCheckColisionList(&cubes[i]);
-		objectsToDisplay.push_back(&cubes[i]);
-	}
-
-	TexturedObject floor1(NULL, glm::vec4(0.3,0.3,0.3,1.0), globalData.models["cube"], globalData.materials["shiny"], globalData.textures["wall"]);
-	floor1.translate(glm::vec3(0,-0.95,0));
-	floor1.scale(glm::vec3(10.0f, 10.0f, 10.0f));
-	floor1.rotate((float)i/20.0f*180, glm::vec3(0,1,0));
-	floor1.translate(glm::vec3(i*0.035, i*0.01f, i*0.035));
-	objectsToDisplay.push_back(&floor1);
-	sampleUser.addToCheckColisionList(&floor1);
-
+	
 	glutMainLoop();
 
 	return 0;

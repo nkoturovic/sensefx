@@ -12,6 +12,7 @@ class ColidableObject : public virtual Object {
 	public:
 		bool isColiding(Object * obj);
 		void addToCheckColisionList(Object * o);
+		void addToCheckColisionList(std::vector <Object *> objects);
 		void removeFromCheckColisionList(Object * o);
 };
 

@@ -96,3 +96,10 @@ void ColidableObject::removeFromCheckColisionList(Object * o) {
 	checkColisionList.erase(
 		std::remove(checkColisionList.begin(), checkColisionList.end(), o), checkColisionList.end());
 }
+
+void ColidableObject::addToCheckColisionList(std::vector <Object *> objects) {
+		for_each (objects.begin(), objects.end(), [this] (Object * o) {
+		if(ColidableObject* c_o = dynamic_cast<ColidableObject*>(o)) 
+			this->addToCheckColisionList(c_o);
+	});
+}

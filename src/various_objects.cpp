@@ -5,140 +5,83 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
-/* ######### CHESS FLOOR ######### */
-/* Upozorenje kod ispod je IZNABADAN GRUBOM SILOM!!!! */
-/* Kod za ovo je prilicno haotican, sve ovo
- * se moze po potrebi ponovo implementirati,
- * ali nije neophodne jer se ovi objekti najvise
- * koriste za testiranje i demonstraciju */
-
-
-ChessFloor::ChessFloor(Object * parent, int numOfUnits) : Object(parent), numOfUnits(numOfUnits) { }
-ChessFloor::ChessFloor(Object * parent) : ChessFloor(parent, 10){ }
-ChessFloor::ChessFloor(int numOfUnits) : ChessFloor(NULL, numOfUnits) { }
-ChessFloor::ChessFloor() : ChessFloor(NULL, 10){ }
-
-void ChessFloor::drawObject() {
-
-	float coef = 1.0f/numOfUnits;
-	glTranslatef(-coef,0,-coef);
-	glTranslatef(-1,0,-1);
-	glScalef(coef,coef,coef);
-	glTranslatef(-4,0,-4);
-
-	for (int i=0; i<numOfUnits/2+1; i++) {
-		glTranslatef(4.0f,0.0f,0.0f);
-		glPushMatrix();
-		for (int j=0; j<numOfUnits/2+1; j++) {
-			glTranslatef(0.0f,0.0f,4.0f);
-			drawChessSingleTexture();
-		}
-		glPopMatrix();
-	}
-
+Room::Room() {
+	init();
 }
 
-void ChessFloor::drawChessSingleTexture() {
-
-	glPushMatrix();
-		glColor3f(0.1,0.1,0.1);
-		glBegin(GL_QUADS);
-			glVertex3f(-1.0, 0.0,-1.0);
-			glVertex3f(1.0, 0.0, -1.0);
-			glVertex3f(1.0, 0.0, 1.0);
-			glVertex3f(-1.0, 0.0, 1.0);
-
-		glEnd();
-
-		glTranslatef(2,0, 0);
-
-		glColor3f(0.9,0.9,0.9);
-		glBegin(GL_QUADS);
-			glVertex3f(-1.0, 0.0,-1.0);
-			glVertex3f(1.0, 0.0, -1.0);
-			glVertex3f(1.0, 0.0, 1.0);
-			glVertex3f(-1.0, 0.0, 1.0);
-		glEnd();
-
-		glTranslatef(0 ,0, 2);
-		glColor3f(0.1,0.1,0.1);
-
-		glBegin(GL_QUADS);
-			glVertex3f(-1.0, 0.0,-1.0);
-			glVertex3f(1.0, 0.0, -1.0);
-			glVertex3f(1.0, 0.0, 1.0);
-			glVertex3f(-1.0, 0.0, 1.0);
-		glEnd();
-
-		glTranslatef(-2 ,0, 0);
-		glColor3f(0.9,0.9,0.9);
-
-		glBegin(GL_QUADS);
-			glVertex3f(-1.0, 0.0,-1.0);
-			glVertex3f(1.0, 0.0, -1.0);
-			glVertex3f(1.0, 0.0, 1.0);
-			glVertex3f(-1.0, 0.0, 1.0);
-		glEnd();
-
-		glPopMatrix();
+void Room::drawObject() {
 }
 
-TriangleFloor::TriangleFloor(Object * parent, int numOfUnits) : Object(parent), numOfUnits(numOfUnits) { }
-TriangleFloor::TriangleFloor(Object * parent) : TriangleFloor(parent, 10){ }
-TriangleFloor::TriangleFloor(int numOfUnits) : TriangleFloor(NULL, numOfUnits) { }
-TriangleFloor::TriangleFloor() : TriangleFloor(NULL, 10){ }
-
-void TriangleFloor::drawObject() {
-	float coef = 1.0f/numOfUnits;
-	glTranslatef(-coef,0,-coef);
-	glTranslatef(-1,0,-1);
-	glScalef(coef,1.0f,coef);
-
-	for (int i=0; i<numOfUnits; i++) {
-		glTranslatef(2.0f,0.0f,0.0f);
-		glPushMatrix();
-		for (int j=0; j<numOfUnits; j++) {
-			glTranslatef(0.0f,0.0f,2.0f);
-			drawtriangleSingleTexture();
-		}
-		glPopMatrix();
-	}
+void Room::setDimensions(glm::vec3 lwh) {
+	this->scale(lwh/2.0f);
+	glm::vec3 backToPosition = this->vecToObjectSys(this->vecToWorldSys(glm::vec3(0,1,-1)));
+	this->translate(backToPosition);
 }
 
-void TriangleFloor::drawtriangleSingleTexture() {
-
-	glPushMatrix();
-
-		glTranslatef(0.0,-0.001,0.0);
-		glColor3f(0.9,0.9,0.9);
-		glBegin(GL_QUADS);
-			glVertex3f(-1.0, 0.0,-1.0);
-			glVertex3f(1.0, 0.0, -1.0);
-			glVertex3f(1.0, 0.0, 1.0);
-			glVertex3f(-1.0, 0.0, 1.0);
-
-		glEnd();
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(0,0.01,0);
-
-		glColor3f(0.1,0.1,0.1);
-		glBegin(GL_TRIANGLES);
-			glVertex3f(-1.0, 0.0,-1.0);
-			glVertex3f(1.0, 0.0,-1.0);
-			glVertex3f(0.0, 0.0, 0.0);
-
-			glVertex3f(1.0, 0.0, 0.0);
-			glVertex3f(1.0, 0.0, 1.0);
-			glVertex3f(0.0, 0.0, 1.0);
-
-			glVertex3f(0.0, 0.0, 1.0);
-			glVertex3f(-1.0, 0.0, 1.0);
-			glVertex3f(-1.0, 0.0, 0.0);
-
-
-		glEnd();
-	glPopMatrix();
+std::vector <Object *> Room::getColisionList() {
+	return this->collisionList;
 }
 
+void Room::init() {
+	frontWall.translate(glm::vec3(0,0,-1*translateCoef));
+	frontWall.scale(glm::vec3(1,1,wallThickness));
+	frontWall.setColor(color);
+	frontWall.model = cube;
+	frontWall.material = material;
+	frontWall.texture = wallTexture;
+	this->addChild(&frontWall);
+
+	backWall.translate(glm::vec3(0,0,1*translateCoef));
+	backWall.scale(glm::vec3(1,1,wallThickness));
+	backWall.setColor(color);
+	backWall.model = cube;
+	backWall.material = material;
+	backWall.texture = wallTexture;
+	this->addChild(&backWall);
+
+	leftWall.translate(glm::vec3(-1*translateCoef,0,0));
+	leftWall.rotate(90, glm::vec3(0,1,0));
+	leftWall.scale(glm::vec3(1,1,wallThickness));
+	leftWall.setColor(color);
+	leftWall.model = cube;
+	leftWall.material = material;
+	leftWall.texture = wallTexture;
+	this->addChild(&leftWall);
+
+	rightWall.translate(glm::vec3(1*translateCoef,0,0));
+	rightWall.rotate(90, glm::vec3(0,1,0));
+	rightWall.scale(glm::vec3(1,1,wallThickness));
+	rightWall.setColor(color);
+	rightWall.model = cube;
+	rightWall.material = material;
+	rightWall.texture = wallTexture;
+	this->addChild(&rightWall);
+
+	floor.translate(glm::vec3(0,-1*translateCoef,0));
+	floor.rotate(90, glm::vec3(1,0,0));
+	floor.scale(glm::vec3(1,1,wallThickness));
+	floor.setColor(color);
+	floor.model = cube;
+	floor.material = material;
+	floor.texture = floorTexture;
+	this->addChild(&floor);
+
+	floorColider.translate(glm::vec3(0,-1*translateCoef,0));
+	floorColider.scale(glm::vec3(1,wallThickness,1));
+	this->addChild(&floorColider);
+
+	ceiling.translate(glm::vec3(0,1*translateCoef,0));
+	ceiling.rotate(90, glm::vec3(1,0,0));
+	ceiling.scale(glm::vec3(1,1,wallThickness));
+	ceiling.setColor(color);
+	ceiling.model = cube;
+	ceiling.material = material;
+	ceiling.texture = ceilingTexture;
+	this->addChild(&ceiling);
+
+	ceilingColider.translate(glm::vec3(0,1*translateCoef,0));
+	ceilingColider.scale(glm::vec3(1,wallThickness,1));
+	this->addChild(&ceilingColider);
+
+
+}

@@ -14,13 +14,17 @@ void Grid::drawObject() {
 
 	if (fill) {
 		glPushMatrix();
-			glTranslatef(0,-0.01,0);
+			glTranslatef(0,0.01,0);
 			glColor3f(.55, .55, .55);
 			glBegin(GL_QUADS);
 					glVertex3f(-1, 0, -1);
+					glTexCoord2f(0, 0);
 					glVertex3f(1, 0, -1);
+					glTexCoord2f(0, 1);
 					glVertex3f(1, 0, 1);
+					glTexCoord2f(1, 1);
 					glVertex3f(-1, 0, 1);
+					glTexCoord2f(1, 0);
 			glEnd();
 		glPopMatrix();
 	}
