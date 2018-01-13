@@ -13,6 +13,7 @@ void Room::drawObject() {
 }
 
 void Room::setDimensions(glm::vec3 lwh) {
+	this->setPositioningMatrix(glm::mat4(1.0f));
 	this->scale(lwh/2.0f);
 	glm::vec3 backToPosition = this->vecToObjectSys(this->vecToWorldSys(glm::vec3(0,1,-1)));
 	this->translate(backToPosition);

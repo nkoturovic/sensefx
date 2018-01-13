@@ -6,7 +6,7 @@
 class DrawableObject : public virtual Object {
 
 	protected:
-		glm::vec4 color;
+		glm::vec4 color = glm::vec4(1,1,1,1);
 
 	public:
 

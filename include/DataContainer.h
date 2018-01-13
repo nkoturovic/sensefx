@@ -51,6 +51,7 @@ class DataContainer {
 		float gravityTimerInterval = 10;
 
 		glm::vec2 mousePosition;
+		DataContainer& operator=(DataContainer rhs);
 };
 
 #endif //SENSEFX_CONTAINER_H

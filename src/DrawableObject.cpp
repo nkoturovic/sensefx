@@ -28,7 +28,7 @@ void DrawableObject::draw() {
 		/* Gde ima materijal osvetljenje ce se automatski ukljuciti, inicijalno je iskljuceno */
 		glDisable(GL_LIGHTING); 
 		/* Postavljanje boje objekta */
-		glColor4f(color.r, color.g, color.b, color.a);
+		glColor4f(this->color.r, this->color.g, this->color.b, this->color.a);
 
 
 		glm::mat4 transformation = this->getPositioningMatrix(); // your transformation matrix.

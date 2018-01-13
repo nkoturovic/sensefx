@@ -10,9 +10,9 @@
 class TexturedObject : public DrawableObject , public TransformableObject {
 
 	public:
-		Model model;
-		Material material;
-		Texture2D texture;
+		Model model = Model("resources/models/cube_medium.obj");
+		Material material = Material("resources/materials/normal.mat");
+		Texture2D texture = Texture2D("resources/textures/default.bmp");
 
 		TexturedObject(Object * parent, glm::vec4 color, Model model, Material material, Texture2D texture);
 		TexturedObject();

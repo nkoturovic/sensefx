@@ -37,6 +37,9 @@
 
 #include "Light.h"
 
+/* Simulacija File Explorer */
+#include "FXSimulation.h"
+
 
 using namespace std;
 
@@ -75,7 +78,7 @@ int main(int argc, char * argv[])
 	const char * title = appConfig.getParameter("TITLE").c_str();
 	glutCreateWindow(title);
 
-	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glEnable(GL_DEPTH_TEST);
 
 	/* Inicijalizacija callback-ova i tajmera */
@@ -100,6 +103,12 @@ int main(int argc, char * argv[])
 	/* Ukljucivanje tekstura */
 	glEnable(GL_TEXTURE_2D);
 
+	//glBlendFunc(GL_SRC_ALPHA, GL_SRC_COLOR);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc (GL_ONE, GL_ONE);
+	//glEnable(GL_ALPHA_TEST);
+	//
+	glEnable(GL_BLEND);
 	/* Podesava se rezim iscrtavanja tekstura tako da boje na teksturi
 	* potpuno odredjuju boju objekata. */
 	// glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -108,40 +117,23 @@ int main(int argc, char * argv[])
 	//glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
 
 	/* Liste (vektori) objekata koji se prosledjuju callback funkcijama i tajmerima */
-	std::vector<Object*> &objectsToDisplay = globalData.objectsToDisplay;
-	std::vector<Object*> &objectsToKeyboard = globalData.objectsToKeyboard;
-	std::vector<Object*> &objectsToMouseMove = globalData.objectsToMouseMove;
-	std::vector<Object*> &objectsToGravity = globalData.objectsToGravity;
+       // std::vector<Object*> &objectsToDisplay = globalData.objectsToDisplay;
+       // std::vector<Object*> &objectsToKeyboard = globalData.objectsToKeyboard;
+       // std::vector<Object*> &objectsToMouseMove = globalData.objectsToMouseMove;
+       // std::vector<Object*> &objectsToGravity = globalData.objectsToGravity;
 	
 	/* IMPORT TEKSTURA MORA NAKON UKLJUCIVANJA TEKSTURA!! */
 	globalData.textures = Texture2D::importAll("resources/textures");
 	globalData.models = Model::importAll("resources/models");
 	globalData.materials = Material::importAll("resources/materials");
 	globalData.lights = Light::importAll("resources/lights");
-
 	globalData.lights["light1"].enable();
 
 	/*******************************************/
 	/* Ispod je dat primer test (demo) program */
 	/*******************************************/
-	DataContainer &gd = globalData;
-
-	//Axis wcs(5);
-	//objectsToDisplay.push_back(&wcs);
-
-	Room room;
-	room.setDimensions(glm::vec3(20,3.55,20));
-	objectsToDisplay.push_back(&room);
-
-	User user;
-	user.translate(glm::vec3(0,5,-20));
-	user.addToCheckColisionList(room.getColisionList());
-	gd.activeCamera = user.fpsViewCamera();
-
-	objectsToKeyboard.push_back(&user);
-	objectsToMouseMove.push_back(&user);
-	objectsToGravity.push_back(&user);
-
+	FXSimulation simulation("demodir");
+	simulation.simulate(&globalData);
 	
 	glutMainLoop();
 
