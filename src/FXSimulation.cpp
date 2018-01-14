@@ -21,6 +21,8 @@ void FXSimulation::simulate(DataContainer * globalData) {
 	/* TODO: DETALJNO PRECESLJATI OVAJ FAJL I IZBACITI STA MOZE U CONFIG-OVE
 	 * I SREDITI KOD !!!! */
 
+	this->dirPath = globalData->simCurrentDir;
+
 	DataContainer * gd = globalData;
 	/* Istrazuje direktorijum i kreira dve liste
 	 * regularni fajlovi i direktorijumi */
@@ -109,7 +111,7 @@ void FXSimulation::simulate(DataContainer * globalData) {
 	newGd.objectsToDisplay.push_back(&room);
 
 	/* Visina sobe TODO: IZMESTITI NA FINIJE MESTO */
-	float h = 3.33;
+	float h = 2.5;
 
 	/* N je max od fajlova i direktorijuma */
 	/* Mesta za direktorijume ima: xxx za n>=3!!! 
@@ -138,7 +140,7 @@ void FXSimulation::simulate(DataContainer * globalData) {
 	/* Final scale coef - odredjuje razmaknutost izmedju fajlova
 	 * samim tim i konacnu velicinu soba jer oni moraju tacno da stanu
 	 * u sobu, i time je moguce skalirati sobu a zajedno i sve u njoj */
-	glm::vec3 fscaleCoef(2.0f, 1.0f, 2.0f);
+	glm::vec3 fscaleCoef(2.3f, 1.0f, 2.3f);
 	room.setDimensions(glm::vec3(n,h,n));
 
 	
@@ -170,14 +172,14 @@ void FXSimulation::simulate(DataContainer * globalData) {
 					TransformableObject * o = tmpVec->back();
 
 					/* Transliraj na inicijalnu poziciju */
-					o->translate(o->vecToObjectSys(glm::vec3( -((float) n/2.0f + 0.5), 0.65, +0.5))*fscaleCoef);
+					o->translate(o->vecToObjectSys(glm::vec3( -((float) n/2.0f + 0.5), 0.5, +0.5))*fscaleCoef);
 
 					/* Transliraj na sledecu slobodnu poziciju */
 					o->translate(o->vecToObjectSys(glm::vec3( (float)j, 0, -(float)i)*fscaleCoef));
 
 					/* TODO: Ovo sje skalirani fajl/folder, mora da
 					 * se ovo preuredi, ne sme ovako da stoji */
-					o->scale(glm::vec3(0.8,0.8,0.8));
+					//o->scale(glm::vec3(0.9,0.9,0.9));
 
 					/* Ubaci u listu za iscrtavanje */
 					newGd.objectsToDisplay.push_back(o);
@@ -198,6 +200,7 @@ void FXSimulation::simulate(DataContainer * globalData) {
 
 	user.addToCheckColisionList(room.getColisionList());
 	newGd.activeUser = &user;
+	newGd.simCurrentDir = dirPath; 
 	newGd.activeCamera = user.fpsViewCamera();
 
 	newGd.objectsToKeyboard.push_back(&user);

@@ -36,6 +36,8 @@ class File : public FXSimulationCObject {
 		std::string path;
 		std::string name;
 
+		float transUpDownParameter = 0.0f;
+
 		File(Simulation * simulation, std::string path);
 		
 		/* Default File action */

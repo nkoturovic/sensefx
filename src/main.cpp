@@ -40,6 +40,7 @@
 /* Simulacija File Explorer */
 #include "FXSimulation.h"
 
+FXSimulation simulation("demodir");
 
 using namespace std;
 
@@ -120,10 +121,6 @@ int main(int argc, char * argv[])
 	//glColorMaterial(GL_FRONT_AND_BACK, GL_EMISSION);
 
 	/* Liste (vektori) objekata koji se prosledjuju callback funkcijama i tajmerima */
-       // std::vector<Object*> &objectsToDisplay = globalData.objectsToDisplay;
-       // std::vector<Object*> &objectsToKeyboard = globalData.objectsToKeyboard;
-       // std::vector<Object*> &objectsToMouseMove = globalData.objectsToMouseMove;
-       // std::vector<Object*> &objectsToGravity = globalData.objectsToGravity;
 	
 	/* IMPORT TEKSTURA MORA NAKON UKLJUCIVANJA TEKSTURA!! */
 	globalData.textures = Texture2D::importAll("resources/textures");
@@ -135,7 +132,7 @@ int main(int argc, char * argv[])
 	/*******************************************/
 	/* Ispod je dat primer test (demo) program */
 	/*******************************************/
-	FXSimulation simulation("demodir");
+	globalData.simCurrentDir = "demodir";
 	simulation.simulate(&globalData);
 	
 	glutMainLoop();
@@ -179,6 +176,8 @@ static void on_display()
 	});
 
 	/* Ovde se obradjuju prosledjeni tekstovi na ekran */
+	/* Tekst za trenutni direktorijum */
+	globalData.textToScreenVec.push_back(Text(glm::vec2(15.0f, globalData.screenSize.y - 25.0f), glm::vec3(0,0,0), "Directory: " + globalData.simCurrentDir));
 
 	for_each (globalData.textToScreenVec.begin(), globalData.textToScreenVec.end(), [] (Text t) {
 		t.print(globalData.screenSize);
@@ -304,13 +303,44 @@ static void fx_simulation_timer(int value) {
 
 	for_each (simColisionList.begin(), simColisionList.end(), [activeUser] (Object * o) {
 		if(File* f_o = dynamic_cast<File*>(o)) {
+
+			
 			if (f_o->isColiding(activeUser)) {
-				
 				/* TODO: Formatiranje teksta da bude iz config-a eksternog */
-				globalData.textToScreenVec.push_back(Text(glm::vec2(15,15), glm::vec3(0.1,1,0.1), "File Name: " + f_o->name));
+				globalData.textToScreenVec.push_back(Text(glm::vec2(15,15), glm::vec3(0,0,0), "File Name: " + f_o->name));
+
+				f_o->rotate(0.22, glm::vec3(0,1,0));
+
+				if (f_o->transUpDownParameter >= 2*M_PI) {
+					f_o->transUpDownParameter = 0.0f;
+				}
+
+				f_o->transUpDownParameter += 0.02;
+
+				f_o->translate(f_o->vecToObjectSys(glm::vec3(0, 0.0005*sin(f_o->transUpDownParameter) ,0)));
+
+				//if (f_o->transUpDownParameter < 0.28f && f_o->transUpDownOrientation > 0)
+				//	f_o->transUpDownParameter += 0.01;
+				//else if (f_o->transUpDownParameter > 0.28f && f_o->transUpDownOrientation > 0.0f)
+				//	f_o->transUpDownOrientation = -1;
+				//else if (f_o->transUpDownParameter > -0.28f && f_o->transUpDownOrientation < 0)
+				//	f_o->transUpDownParameter -= 0.01;
+				//else if (f_o->transUpDownParameter < -0.28f && f_o->transUpDownOrientation < 0)
+				//	f_o->transUpDownOrientation = 1;
+
+				//f_o->translate(glm::vec3(0.0, 0.0002*f_o->transUpDownOrientation, 0));
+
+			}
+		}
+
+		if (globalData.pressedKeys[(int)'e']) {
+			if (Directory * d_o = dynamic_cast<Directory *>(o)) {
+				globalData.simCurrentDir = d_o->path;
+				simulation.simulate(&globalData);
 			}
 		}
 	});
+	
 
 	glutTimerFunc(globalData.fxSimulationTimerInterval, fx_simulation_timer, globalData.fxSimulationTimerId);
 

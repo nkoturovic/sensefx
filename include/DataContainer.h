@@ -39,6 +39,7 @@ class DataContainer {
 		std::vector <Text> textToScreenVec;
 
 		std::vector <Object *> simColisionList;
+		std::string simCurrentDir;
 
 		Camera * activeCamera;
 		User * activeUser;
