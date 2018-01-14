@@ -18,6 +18,9 @@ FXSimulation::FXSimulation(std::string dirPath) : dirPath(dirPath) {}
 
 void FXSimulation::simulate(DataContainer * globalData) {
 
+	/* TODO: DETALJNO PRECESLJATI OVAJ FAJL I IZBACITI STA MOZE U CONFIG-OVE
+	 * I SREDITI KOD !!!! */
+
 	DataContainer * gd = globalData;
 	/* Istrazuje direktorijum i kreira dve liste
 	 * regularni fajlovi i direktorijumi */
@@ -30,18 +33,69 @@ void FXSimulation::simulate(DataContainer * globalData) {
 		std::string filePath = filePathp.u8string();
 
 		if (fs::is_directory(p)) {
+			//Directory * dir = new Directory(this, filePath);
+			//dir->material = gd->materials["directory"];
+			//dir->model = gd->models["directory"];
+			//dir->texture = gd->textures["directory"];
+			//directories.push_back(dir);
+
 			Directory * dir = new Directory(this, filePath);
-			dir->material = gd->materials["directory"];
+
+			/* Model */
+			std::string tmpModPath = (std::string)"resources/models/" + "dir_" + dir->name + ".obj";
+		    	if (fs::exists(tmpModPath) && dir->name.length() > 0) {
+				dir->model = Model(tmpModPath);
+			} else {
+				dir->model = Model("resources/models/dir.obj");
+			}
+
+			/* Materijal */
+			std::string tmpMatPath = (std::string)"resources/materials/" + "dir_" + dir->name + ".mat";
+		    	if (fs::exists(tmpMatPath) && dir->name.length() > 0) {
+				dir->material = Material(tmpMatPath);
+			} else {
+				dir->material = Material("resources/materials/dir.mat");
+			}
+
+			/* Tekstura */
+			std::string tmpTexPath = (std::string)"resources/textures/" + "dir_" + dir->name + ".bmp";
+		    	if (fs::exists(tmpTexPath) && dir->name.length() > 0) {
+				dir->texture = Texture2D(tmpTexPath);
+			} else {
+				dir->texture = Texture2D("resources/textures/dir.bmp");
+			}
+
 			directories.push_back(dir);
+
 		} else {
 			RegularFile * file = new RegularFile(this, filePath);
-			file->material = gd->materials["regular_file"];
-			/* Ako postoji tekstura za ekstenziju formata file_ext, postavi je */
-			std::string tmpTexPath = (std::string)"resources/textures/" + "file_" + file->extension + ".bmp";
 
+			/* Ako postoje parametri za ekstenziju formata file_xxx, postavi je */
+
+			/* Model */
+			std::string tmpModPath = (std::string)"resources/models/" + "file_" + file->extension + ".obj";
+		    	if (fs::exists(tmpModPath) && file->extension.length() > 0) {
+				file->model = Model(tmpModPath);
+			} else {
+				file->model = Model("resources/models/regular_file.obj");
+			}
+
+			/* Materijal */
+			std::string tmpMatPath = (std::string)"resources/materials/" + "file_" + file->extension + ".mat";
+		    	if (fs::exists(tmpMatPath) && file->extension.length() > 0) {
+				file->material = Material(tmpMatPath);
+			} else {
+				file->material = Material("resources/materials/regular_file.mat");
+			}
+
+			/* Tekstura */
+			std::string tmpTexPath = (std::string)"resources/textures/" + "file_" + file->extension + ".bmp";
 		    	if (fs::exists(tmpTexPath) && file->extension.length() > 0) {
 				file->texture = Texture2D(tmpTexPath);
+			} else {
+				file->texture = Texture2D("resources/textures/regular_file.bmp");
 			}
+
 			regularFiles.push_back(file);
 		}
 	   }
@@ -55,7 +109,7 @@ void FXSimulation::simulate(DataContainer * globalData) {
 	newGd.objectsToDisplay.push_back(&room);
 
 	/* Visina sobe TODO: IZMESTITI NA FINIJE MESTO */
-	float h = 3.55;
+	float h = 3.33;
 
 	/* N je max od fajlova i direktorijuma */
 	/* Mesta za direktorijume ima: xxx za n>=3!!! 
@@ -84,7 +138,7 @@ void FXSimulation::simulate(DataContainer * globalData) {
 	/* Final scale coef - odredjuje razmaknutost izmedju fajlova
 	 * samim tim i konacnu velicinu soba jer oni moraju tacno da stanu
 	 * u sobu, i time je moguce skalirati sobu a zajedno i sve u njoj */
-	glm::vec3 fscaleCoef(3.0f, 1.0f, 3.0f);
+	glm::vec3 fscaleCoef(2.0f, 1.0f, 2.0f);
 	room.setDimensions(glm::vec3(n,h,n));
 
 	
@@ -121,8 +175,13 @@ void FXSimulation::simulate(DataContainer * globalData) {
 					/* Transliraj na sledecu slobodnu poziciju */
 					o->translate(o->vecToObjectSys(glm::vec3( (float)j, 0, -(float)i)*fscaleCoef));
 
+					/* TODO: Ovo sje skalirani fajl/folder, mora da
+					 * se ovo preuredi, ne sme ovako da stoji */
+					o->scale(glm::vec3(0.8,0.8,0.8));
+
 					/* Ubaci u listu za iscrtavanje */
 					newGd.objectsToDisplay.push_back(o);
+					newGd.simColisionList.push_back(o);
 					/* Izbaci iz liste f/d */
 					tmpVec->pop_back();
 			}
@@ -138,6 +197,7 @@ void FXSimulation::simulate(DataContainer * globalData) {
 	room.setDimensions(glm::vec3(fscaleCoef.x*n,h,fscaleCoef.x*n));
 
 	user.addToCheckColisionList(room.getColisionList());
+	newGd.activeUser = &user;
 	newGd.activeCamera = user.fpsViewCamera();
 
 	newGd.objectsToKeyboard.push_back(&user);

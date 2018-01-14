@@ -29,6 +29,8 @@ void TexturedObject::drawObject() {
 
 	/* Iskljucivanje teksture */
 	Texture2D::unbind();
+
+	glEnable(GL_DEPTH_TEST);
 }
 
 void TexturedObject::drawTexturedObject() {

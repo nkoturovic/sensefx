@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+
 #include "Config.h"
 #include "Object.h"
 #include "Camera.h"
@@ -10,6 +11,8 @@
 #include "Model.h"
 #include "Light.h"
 #include "Material.h"
+#include "User.h"
+#include "Text.h"
 
 class DataContainer {
 	public:
@@ -17,6 +20,10 @@ class DataContainer {
 		 * container sadrzi liste objekata 
 		 * koje treba proslediti funkcijama on_*
 		 * da ih obrade. */
+
+		/* Screen size (inicijalna vrednost je 800x600) */
+		/* Ovo menja on_reshape funkcija */
+		glm::vec2 screenSize = glm::vec2(800, 600);
 
 		/* Configs map */
 		std::map<std::string, Config> configs;
@@ -29,8 +36,12 @@ class DataContainer {
 		std::vector <Object*> objectsToKeyboard; 
 		std::vector <Object*> objectsToMouseMove;
 		std::vector <Object*> objectsToGravity;
+		std::vector <Text> textToScreenVec;
+
+		std::vector <Object *> simColisionList;
 
 		Camera * activeCamera;
+		User * activeUser;
 
 		bool pressedKeys[256];
 		int keyPressedPositionX;
@@ -49,6 +60,9 @@ class DataContainer {
 
 		const int gravityTimerId = 3;
 		float gravityTimerInterval = 10;
+
+		const int fxSimulationTimerId = 4;
+		float fxSimulationTimerInterval = 10;
 
 		glm::vec2 mousePosition;
 		DataContainer& operator=(DataContainer rhs);

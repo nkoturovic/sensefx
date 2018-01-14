@@ -55,6 +55,11 @@ DataContainer& DataContainer::operator=(DataContainer rhs) {
 			}
 		});
 
+
+		/* Nalazice se sigurno u nekom od prethodnih
+		 * zato nema potrebe da se radi delete ovog (u display sigurno) !!! */
+		this->simColisionList = rhs.simColisionList;
+
 		this->objectsToGravity.clear();
 		this->objectsToGravity.resize(0);
 
@@ -63,6 +68,7 @@ DataContainer& DataContainer::operator=(DataContainer rhs) {
 		this->objectsToKeyboard = rhs.objectsToKeyboard;
 		this->objectsToMouseMove = rhs.objectsToMouseMove;
 		this->objectsToGravity = rhs.objectsToGravity;
+		this->activeUser = rhs.activeUser;
 		this->activeCamera = rhs.activeCamera;
 
 		return *this;
