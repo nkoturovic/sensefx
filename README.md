@@ -10,6 +10,13 @@
 ### Arch/Manjaro Linux
       sudo pacman -Sy freeglut glm
 
+## Kompilacija
+Shell programom doći u direktorijum projekta i ukucati: `make`
+
+## Primer pokretanja programa
+U direktorijumu projekta ukucati:
+     `./senseFX demo_directory`
+
 ## Kontrole
 ### Tastatura
 | Key              | funkcija                         |
@@ -22,13 +29,14 @@
 
 **Miš** - Look around (rotiranje kamere)
 
-## Kompilacija
-Shell programom doći u direktorijum projekta i ukucati: `make`
-
-## Primer pokretanja programa
-U direktorijumu projekta ukucati:
-     `./senseFX demo_directory`
 
 ## NAPOMENA
 * Projekat je još uvek u fazi razvoja, neke funkcionalnosti još uvek nisu implementirane, kod je potrebno dodatno "isčistiti" i ulepšati. Takođe velika je verovatnoća da postoje bug-ovi.
 * Ovaj projekat je moj prvi projekat i susret sa programskim jezikom C++, do sada nisam imao iskustva sa ovim jezikom ali jesam sa drugim objektno-orijentisanim jezicima.
+
+## PREUZET KOD (tuđi):
+* Kod za učitavanje .bmp fajlova (image.h i image.cpp): [objloader](http://poincare.matf.bg.ac.rs/~ivan/files/rg/vezbe/07/32_texture.tar.bz2)
+* Kod za učitavanje .obj fajlova (objloader.h i objloader.cpp): [imgloader](http://poincare.matf.bg.ac.rs/~ivan/files/rg/vezbe/07/32_texture.tar.bz2)
+
+## INFO
+Za više informacija posetiti Wiki sekciju projekta: [Wiki](https://github.com/MATF-RG17/RG026-sensefx/wiki)

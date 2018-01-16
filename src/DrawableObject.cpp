@@ -22,7 +22,7 @@ DrawableObject::DrawableObject() : DrawableObject(glm::vec4(1,1,1,1)) {}
 void DrawableObject::draw() {
 	glPushMatrix();
 
-		/* Iscrtava mrezu (kocku) oko "prostora" objekata */
+		/* Iscrtava mrezu (kocku) oko "prostora" objekata - uncomment */
 		//drawSurroundingGrid();
 		
 		/* Gde ima materijal osvetljenje ce se automatski ukljuciti, inicijalno je iskljuceno */
@@ -36,8 +36,6 @@ void DrawableObject::draw() {
 
 		/* TODO: BUGFIX TEKSTURE*/
 		/* Skaliramo teksture za repeatable (bio je BUG) razvlacenja */
-		/* Jos uvek ima bug za nejednako skalirane objekte */
-		/* Mozda bi bilo drugacije da se skalira sa glScale u draw-u ( verovatno bi) */
 		if(TexturedObject* t_o = dynamic_cast<TexturedObject*>(this)) {
 			if (t_o->texture.isRepeatingS() || t_o->texture.isRepeatingT()) {
 				/* Uzimamo scale iz matrice transformacija */

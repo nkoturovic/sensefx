@@ -65,8 +65,9 @@ static void mouse_timer(int value);
 static void gravity_timer(int value);
 static void animation_timer(int value);
 static void fx_timer(int value);
-static void fx_changedir(std::string newDir);
 
+/* Pomocne funkcije */
+static void fx_changedir(std::string newDir);
 
 int main(int argc, char * argv[])
 {
@@ -89,6 +90,11 @@ int main(int argc, char * argv[])
 
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glEnable(GL_DEPTH_TEST);
+
+	float clearR = stof(appConfig.getParameter("CLEAR_COLOR_R"));
+	float clearG = stof(appConfig.getParameter("CLEAR_COLOR_G"));
+	float clearB = stof(appConfig.getParameter("CLEAR_COLOR_B"));
+	glClearColor(clearR, clearG, clearB, 1);
 
 	/* Callback-ovi */
 	glutDisplayFunc(on_display);
@@ -114,11 +120,9 @@ int main(int argc, char * argv[])
 
 	/* Ukljucivanje tekstura */
 	glEnable(GL_TEXTURE_2D);
-	// glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 	/* Ukljucivanje providnosti objekata */
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA); 
 
 
 	glEnable(GL_BLEND);
@@ -141,13 +145,10 @@ int main(int argc, char * argv[])
 	gd.lights["light5"].enable();
 	
 	std::string dirPath = argv[1];
-	/* Obezbedjujemo da se ne zavrsava sa '/' 
-	 * jer je to invalid format */
-	//if (dirPath[dirPath.size() - 1] == '/')
-	//	dirPath[dirPath.size() - 1] = '\0';
 
 	/* Postavljamo inicijalni direktorijum i odavde
-	 * fx_timer() preuzima dalji posao oko fajlova !!! */
+	 * fx_timer() preuzima dalji posao oko fajl explorera !!! */
+
 	globalData.fxCurrentDir = dirPath;
 	glutTimerFunc(globalData.fxTimerInterval, fx_timer, globalData.fxTimerId);
 
@@ -161,8 +162,7 @@ int main(int argc, char * argv[])
 static void on_display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.08, 0.08, 0.17, 1); // Klasa color potrebna (mozda i ne)
-	
+
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 
@@ -175,7 +175,8 @@ static void on_display()
 
 	std::vector<Object* > &objectsToDisplay = globalData.objectsToDisplay;
 	/* Sortiranje po daljini od user-a  Posto se iz vektora cita unazad,
-	 * sortiramo u obrnutom poretku, na pocetak idu najdalji */
+	 * sortiramo u obrnutom poretku, na pocetak idu najdalji - ovo je 
+	 * bitno zbog ispravne obrade providnosti objekata!! */
 	User * au = globalData.activeUser;
 	std::sort (objectsToDisplay.begin(), objectsToDisplay.end(), [au] (Object * a, Object * b) -> bool {
 		if (glm::length(au->pointToObjectSys(a, glm::vec3(0,0,0))) > glm::length(au->pointToObjectSys(b, glm::vec3(0,0,0))))
@@ -190,15 +191,15 @@ static void on_display()
 			d_o->draw();
 	});
 
-	/* Ovde se obradjuju prosledjeni tekstovi na ekran */
 	/* Tekst za trenutni direktorijum */
 	globalData.textToScreenVec.push_back(Text(glm::vec2(15.0f, globalData.screenSize.y - 25.0f), glm::vec3(1,0,0), "Exploring: " + globalData.fxCurrentDir));
 
+	/* Ovde se obradjuju prosledjeni tekstovi na ekran */
 	for_each (globalData.textToScreenVec.begin(), globalData.textToScreenVec.end(), [] (Text t) {
 		t.print(globalData.screenSize);
 	});
 
-	/* Ispisano se brise */
+	/* Ispisani tekst se brise */
 	globalData.textToScreenVec.clear();
 
 	glutSwapBuffers();
@@ -209,8 +210,14 @@ static void on_reshape(int width, int height)
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60, (float) width/(float) height, 0.01f, 2000.0f);
 
+	Config & appConfig = globalData.configs["application"];
+	float viewMin = stof(appConfig.getParameter("VIEW_DISTANCE_MIN"));
+	float viewMax = stof(appConfig.getParameter("VIEW_DISTANCE_MAX"));
+
+	gluPerspective(60, (float) width/(float) height, viewMin, viewMax);
+
+	/* Cuvamo velicinu ekrana jer nam treba na drugim mestima */
 	globalData.screenSize = glm::vec2(width,height);
 }
 
@@ -256,7 +263,7 @@ static void keyboard_timer(int value)
 	if (value != globalData.keyboardTimerId)
 		return;
 
-	/* TODO: Obradjivanje zahteva tastature, ne bi trebalo ovde da stoje verovatno!!! */
+	/* Obradjivanje zahteva za tastatru */
 	std::vector<Object* > &objectsToKeyboard = globalData.objectsToKeyboard;
 	for_each (objectsToKeyboard.begin(), objectsToKeyboard.end(), [] (Object * o) {
 		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o))
@@ -295,10 +302,12 @@ static void gravity_timer(int value)
 	if (value != globalData.gravityTimerId)
 		return;
 
+	/* Pad objekata kojima je pridruzena gravitacija i nisu na podu */
 	std::vector<Object* > &toGravity = globalData.objectsToGravity;
 	for_each (toGravity.begin(), toGravity.end(), [] (Object * o) {
 		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o)) {
-			m_o->addToVelocity(glm::vec3(0.0f, -0.005, 0.0f));
+			float gravity = -stof(globalData.configs["gravity"].getParameter("GRAVITY"));
+			m_o->addToVelocity(glm::vec3(0.0f, gravity, 0.0f));
 			m_o->move(m_o->getVelocity());
 		}
 	});
@@ -337,7 +346,9 @@ static void fx_timer(int value) {
 	*** Implementacija fajl explorera pocinje odavde ***
 	***************************************************/
 	/* Ovaj tajmer moze da se shvati kao tajmer za sve poslove file explorer simulacije,
-	 * ovde je ubacen za razresavanje kolizije sa objektima, za neku drugu simulaciju 
+	 * ovde je ubaceneno i razresavanje kolizije sa objektima, kada udjemo u zonu kolizije
+	 * zapocinje se animacija objekta i ispisuje tekst (naziv fajla), kada se pritisne 
+	 * taster 'e' metod action() na fajlu se poziva (npr. ulazak u sledeci direktorijum
 	 * ovaj tajmer postoji samo za file explorer */
 
 	DataContainer &gd = globalData;
