@@ -70,6 +70,10 @@ static void fx_changedir(std::string newDir);
 
 int main(int argc, char * argv[])
 {
+	/* Argumenti - inicijalna provera */
+	string usage = "Usage: " + (string) argv[0] + " dirPath";
+	ast(argc == 2, usage.c_str());
+
 	globalData.configs = Config::importAll("configs", "DEFAULT");
 	Config & appConfig = globalData.configs["application"];
 
@@ -136,9 +140,6 @@ int main(int argc, char * argv[])
 	gd.lights["light4"].enable();
 	gd.lights["light5"].enable();
 	
-	string usage = (string) argv[0] + " dirPath";
-	ast(argc == 2, usage.c_str());
-
 	std::string dirPath = argv[1];
 	/* Obezbedjujemo da se ne zavrsava sa '/' 
 	 * jer je to invalid format */

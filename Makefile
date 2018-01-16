@@ -1,6 +1,6 @@
 PROGRAM = senseFX.out
 CXX     = g++
-CXXFLAGS = -std=c++17 -I include -g
+CXXFLAGS = -std=c++17 -I include
 LDLIBS  = -lglut -lGLU -lGL -lstdc++fs 
 WFLAGS = -Wall -Wextra
 SRC_DIR = src
