@@ -2,7 +2,7 @@
 [![not found](examples_img/yt-thumbnail.png)](https://www.youtube.com/watch?v=HEGZIUWtsqQ)
 
 ## Requirements
-   Linux, [g++ (c++17)](https://gcc.gnu.org/), [OpenGL](https://www.opengl.org/), [glut](https://www.opengl.org/resources/libraries/glut/), [glm](https://glm.g-truc.net/0.9.8/index.html")
+   Linux, [g++ (c++17)](https://gcc.gnu.org/), [OpenGL](https://www.opengl.org/), [glut](https://www.opengl.org/resources/libraries/glut/), [glm](https://glm.g-truc.net/0.9.8/index.html)
 
 ## Instalacija
 ### Ubuntu/Debian
