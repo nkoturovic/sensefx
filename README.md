@@ -35,8 +35,8 @@ U direktorijumu projekta ukucati:
 * Ovaj projekat je moj prvi projekat i susret sa programskim jezikom C++, do sada nisam imao iskustva sa ovim jezikom ali jesam sa drugim objektno-orijentisanim jezicima.
 
 ## PREUZET KOD (tuđi):
-* Kod za učitavanje .bmp fajlova (image.h i image.cpp): [objloader](http://poincare.matf.bg.ac.rs/~ivan/files/rg/vezbe/07/32_texture.tar.bz2)
-* Kod za učitavanje .obj fajlova (objloader.h i objloader.cpp): [imgloader](https://github.com/huamulan/OpenGL-tutorial/blob/master/common)
+* Kod za učitavanje .bmp fajlova (image.h i image.cpp): [imgloader](http://poincare.matf.bg.ac.rs/~ivan/files/rg/vezbe/07/32_texture.tar.bz2)
+* Kod za učitavanje .obj fajlova (objloader.h i objloader.cpp): [objloader](https://github.com/huamulan/OpenGL-tutorial/blob/master/common)
 
 ## INFO
 Za više informacija posetiti Wiki sekciju projekta: [Wiki](https://github.com/MATF-RG17/RG026-sensefx/wiki)
