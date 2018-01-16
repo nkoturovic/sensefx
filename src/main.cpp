@@ -2,6 +2,9 @@
 #include <map>
 #include <algorithm>
 
+/* OBRADA GRESAKA */
+#include "ast.h"
+
 /* OPEN_GL */
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -37,10 +40,9 @@
 
 #include "Light.h"
 
-/* Simulacija File Explorer */
-#include "FXSimulation.h"
-
-FXSimulation simulation("demodir");
+/* RAD sa direktorijumom */
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 
 using namespace std;
 
@@ -61,14 +63,15 @@ static void redisplay_timer(int value);
 static void keyboard_timer(int value);
 static void mouse_timer(int value);
 static void gravity_timer(int value);
-static void fx_simulation_timer(int value);
+static void animation_timer(int value);
+static void fx_timer(int value);
+static void fx_changedir(std::string newDir);
 
 
 int main(int argc, char * argv[])
 {
-	globalData.configs = Config::importAll("configs", "DEVELOPMENT");
-
-	Config appConfig = globalData.configs["application"];
+	globalData.configs = Config::importAll("configs", "DEFAULT");
+	Config & appConfig = globalData.configs["application"];
 
 	glutInit(&argc, argv);
 	int dflWidth = std::stoi(appConfig.getParameter("WIN_WIDTH"));
@@ -83,19 +86,21 @@ int main(int argc, char * argv[])
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glEnable(GL_DEPTH_TEST);
 
-	/* Inicijalizacija callback-ova i tajmera */
+	/* Callback-ovi */
 	glutDisplayFunc(on_display);
 	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(on_keyboard);
 	glutKeyboardUpFunc(on_keyboard_release);
 	glutMotionFunc(on_mouse_move);
-	glutTimerFunc(globalData.fxSimulationTimerInterval, fx_simulation_timer, globalData.fxSimulationTimerId);
 	glutPassiveMotionFunc(on_mouse_move);
 	glutSetCursor(GLUT_CURSOR_NONE);
+
+	/* Tajmeri */
 	glutTimerFunc(globalData.redisplayTimerInterval, redisplay_timer, globalData.redisplayTimerId);
 	glutTimerFunc(globalData.mouseTimerInterval, mouse_timer, globalData.mouseTimerId);
 	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
 	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
+	glutTimerFunc(globalData.animationTimerInterval, animation_timer, globalData.animationTimerId);
 
 	/* Normalizacija normala */
 	glEnable(GL_NORMALIZE);
@@ -105,36 +110,46 @@ int main(int argc, char * argv[])
 
 	/* Ukljucivanje tekstura */
 	glEnable(GL_TEXTURE_2D);
-
-	//glBlendFunc(GL_SRC_ALPHA, GL_SRC_COLOR);
-	// THISONE glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc (GL_ONE, GL_ONE);
-	glEnable(GL_BLEND);
-
-       // glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR );
-	/* Podesava se rezim iscrtavanja tekstura tako da boje na teksturi
-	* potpuno odredjuju boju objekata. */
 	// glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-	/* Uticaj boje na materijal  */
-	//glColorMaterial(GL_FRONT_AND_BACK, GL_EMISSION);
+	/* Ukljucivanje providnosti objekata */
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA); 
 
-	/* Liste (vektori) objekata koji se prosledjuju callback funkcijama i tajmerima */
-	
-	/* IMPORT TEKSTURA MORA NAKON UKLJUCIVANJA TEKSTURA!! */
-	globalData.textures = Texture2D::importAll("resources/textures");
-	globalData.models = Model::importAll("resources/models");
-	globalData.materials = Material::importAll("resources/materials");
-	globalData.lights = Light::importAll("resources/lights");
-	globalData.lights["light1"].enable();
 
-	/*******************************************/
-	/* Ispod je dat primer test (demo) program */
-	/*******************************************/
-	globalData.simCurrentDir = "demodir";
-	simulation.simulate(&globalData);
+	glEnable(GL_BLEND);
+
+	/* Deljeni globalni podaci programa */
+	DataContainer &gd = globalData;
+
+	/* Importovanje textura/modela/materijala i svetla */
+	gd.textures = Texture2D::importAll("resources/textures");
+	gd.models = Model::importAll("resources/models");
+	gd.materials = Material::importAll("resources/materials");
+	gd.lights = Light::importAll("resources/lights");
+
+	/* Ukljucivanje svetla */
+	gd.lights["light0"].enable();
+	gd.lights["light1"].enable();
+	gd.lights["light2"].enable();
+	gd.lights["light3"].enable();
+	gd.lights["light4"].enable();
+	gd.lights["light5"].enable();
 	
+	string usage = (string) argv[0] + " dirPath";
+	ast(argc == 2, usage.c_str());
+
+	std::string dirPath = argv[1];
+	/* Obezbedjujemo da se ne zavrsava sa '/' 
+	 * jer je to invalid format */
+	if (dirPath[dirPath.size() - 1] == '/')
+		dirPath[dirPath.size()-1] = '\0';
+
+	/* Postavljamo inicijalni direktorijum i odavde
+	 * fx_timer() preuzima dalji posao oko fajlova !!! */
+	globalData.fxCurrentDir = dirPath;
+	glutTimerFunc(globalData.fxTimerInterval, fx_timer, globalData.fxTimerId);
+
 	glutMainLoop();
 
 	return 0;
@@ -146,7 +161,6 @@ static void on_display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.08, 0.08, 0.17, 1); // Klasa color potrebna (mozda i ne)
-
 	
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
@@ -155,8 +169,8 @@ static void on_display()
 	glLoadIdentity();
 
 	/* Postavljanje tacke gledista */
-	glLoadMatrixf(glm::value_ptr(globalData.activeCamera->viewMatrix()));
-	//gluLookAt(0.2, 0.2, 0.2, 0, 0.2, 0, 0, 1, 0);
+	if (globalData.activeCamera != NULL)
+		glLoadMatrixf(glm::value_ptr(globalData.activeCamera->viewMatrix()));
 
 	std::vector<Object* > &objectsToDisplay = globalData.objectsToDisplay;
 	/* Sortiranje po daljini od user-a  Posto se iz vektora cita unazad,
@@ -170,14 +184,14 @@ static void on_display()
 	});
 
 	/* Iscrtavanje objekata */
-	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [objectsToDisplay] (Object * o) {
+	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [] (Object * o) {
 		if(DrawableObject * d_o = dynamic_cast<DrawableObject*>(o))
 			d_o->draw();
 	});
 
 	/* Ovde se obradjuju prosledjeni tekstovi na ekran */
 	/* Tekst za trenutni direktorijum */
-	globalData.textToScreenVec.push_back(Text(glm::vec2(15.0f, globalData.screenSize.y - 25.0f), glm::vec3(0,0,0), "Directory: " + globalData.simCurrentDir));
+	globalData.textToScreenVec.push_back(Text(glm::vec2(15.0f, globalData.screenSize.y - 25.0f), glm::vec3(1,0,0), "Exploring: " + globalData.fxCurrentDir));
 
 	for_each (globalData.textToScreenVec.begin(), globalData.textToScreenVec.end(), [] (Text t) {
 		t.print(globalData.screenSize);
@@ -204,7 +218,9 @@ static void on_keyboard(unsigned char c, int x, int y)
 	/* U switch-u se obradjuju komande koje ne uticu na
 	 * pojedinacne objekte vec na ceo program */
 	switch (c) {
-		case 27: exit(EXIT_SUCCESS);
+		case 27: 
+			globalData.deallocFx();
+			exit(EXIT_SUCCESS);
 	}
 
 	globalData.pressedKeys[c] = true;
@@ -289,59 +305,214 @@ static void gravity_timer(int value)
 	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
 }
 
-static void fx_simulation_timer(int value) {
+
+static void animation_timer(int value) {
 
 	/* Ovaj tajmer moze da se shvati kao tajmer za sve poslove file explorer simulacije,
 	 * ovde je ubacen za razresavanje kolizije sa objektima, za neku drugu simulaciju 
-	 * ovaj tajmer treba da se menja */
+	 * ovaj tajmer postoji samo za file explorer */
 
-	if (value != globalData.fxSimulationTimerId)
+	if (value != globalData.animationTimerId)
+		return;
+	
+	std::vector<Object* > &toAnimation = globalData.objectsToAnimation;
+	for_each (toAnimation.begin(), toAnimation.end(), [] (Object * o) {
+		if(AnimatedObject* a_o = dynamic_cast<AnimatedObject*>(o)) {
+			if (a_o->isAnimationOngoing())
+				a_o->animate();
+		}
+	});
+
+	glutTimerFunc(globalData.animationTimerInterval, animation_timer, globalData.animationTimerId);
+
+}
+
+static void fx_timer(int value) {
+
+	/***************************************************
+	*** Implementacija fajl explorera pocinje odavde ***
+	***************************************************/
+	/* Ovaj tajmer moze da se shvati kao tajmer za sve poslove file explorer simulacije,
+	 * ovde je ubacen za razresavanje kolizije sa objektima, za neku drugu simulaciju 
+	 * ovaj tajmer postoji samo za file explorer */
+
+	DataContainer &gd = globalData;
+
+	/* Proverava da li je direktorijum promenjen i
+	 * puni globalData (memoriju) potrebnim podacima */
+	if (gd.fxAlocatedDir != gd.fxCurrentDir) {
+		fx_changedir(gd.fxCurrentDir);
+	}
+
+	if (value != globalData.fxTimerId)
 		return;
 
+
 	User * activeUser = globalData.activeUser;
-	std::vector<Object* > &simColisionList = globalData.simColisionList;
+	std::vector<Object* > colisionList = globalData.fxFiles;
 
-	for_each (simColisionList.begin(), simColisionList.end(), [activeUser] (Object * o) {
-		if(File* f_o = dynamic_cast<File*>(o)) {
+	for_each (colisionList.begin(), colisionList.end(), [activeUser] (Object * o) {
 
+
+		if(FileObject * f_o = dynamic_cast<FileObject*>(o)) {
 			
 			if (f_o->isColiding(activeUser)) {
-				/* TODO: Formatiranje teksta da bude iz config-a eksternog */
-				globalData.textToScreenVec.push_back(Text(glm::vec2(15,15), glm::vec3(0,0,0), "File Name: " + f_o->name));
 
-				f_o->rotate(0.22, glm::vec3(0,1,0));
-
-				if (f_o->transUpDownParameter >= 2*M_PI) {
-					f_o->transUpDownParameter = 0.0f;
+				/* Ovde se razresavaju tzv. Akcije fajlova */
+				if (globalData.pressedKeys[(int)'e']) {
+					f_o->action();
+					globalData.pressedKeys[(int)'e'] = false;
 				}
 
-				f_o->transUpDownParameter += 0.02;
+				/* TODO: Formatiranje teksta da bude iz config-a eksternog */
+				/* Ispisujemo ime fajla na ekranu */
 
-				f_o->translate(f_o->vecToObjectSys(glm::vec3(0, 0.0005*sin(f_o->transUpDownParameter) ,0)));
+				std::string fileType = "File";
+				if (dynamic_cast<DirectoryObject*>(o)) {
+					fileType = "Directory";	
+				} else if(dynamic_cast<RegularFileObject*>(o)) {
+					fileType = "File";
+				}
 
-				//if (f_o->transUpDownParameter < 0.28f && f_o->transUpDownOrientation > 0)
-				//	f_o->transUpDownParameter += 0.01;
-				//else if (f_o->transUpDownParameter > 0.28f && f_o->transUpDownOrientation > 0.0f)
-				//	f_o->transUpDownOrientation = -1;
-				//else if (f_o->transUpDownParameter > -0.28f && f_o->transUpDownOrientation < 0)
-				//	f_o->transUpDownParameter -= 0.01;
-				//else if (f_o->transUpDownParameter < -0.28f && f_o->transUpDownOrientation < 0)
-				//	f_o->transUpDownOrientation = 1;
+				globalData.textToScreenVec.push_back(Text(glm::vec2(15,15), glm::vec3(0,1,0), fileType + ": " + f_o->name));
 
-				//f_o->translate(glm::vec3(0.0, 0.0002*f_o->transUpDownOrientation, 0));
-
-			}
-		}
-
-		if (globalData.pressedKeys[(int)'e']) {
-			if (Directory * d_o = dynamic_cast<Directory *>(o)) {
-				globalData.simCurrentDir = d_o->path;
-				simulation.simulate(&globalData);
+				f_o->startAnimation();
+				f_o->startGlowing();
+			} else {
+				/* Budemo sigurni da ni jedna vise animacija nije pustena sem
+				 * ona kada se objekti sudaraju */
+				f_o->endAnimation();
+				f_o->stopGlowing();
 			}
 		}
 	});
+
 	
+	glutTimerFunc(globalData.fxTimerInterval, fx_timer, globalData.fxTimerId);
 
-	glutTimerFunc(globalData.fxSimulationTimerInterval, fx_simulation_timer, globalData.fxSimulationTimerId);
+}
 
+/* Funkcija koja menja/ucitava direktorijum */
+static void fx_changedir(std::string newDir) {
+
+	DataContainer &gd = globalData;
+	/* Ukoliko postoje fajlovi simulacije je vec postojala
+	 * ukloni ih! prethodne promenljive simulacije (dealociraj) */
+	if (gd.fxFiles.size()) 
+		gd.deallocFx();
+
+	/* Loading screen on directory change */
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	Text loading(glm::vec2(globalData.screenSize.x/2.0f - 100, globalData.screenSize.y/2.0f), glm::vec3(1,1,1), "Loading, please wait . . . ");
+	loading.print(globalData.screenSize);	
+	glutSwapBuffers();
+
+	/* Config za sobu je */
+	Config & roomCfg = gd.configs["room"];
+
+	std::vector <FileObject *> filesVec = FileObject::importAll(newDir, stoi(roomCfg.getParameter("MAX_OBJECTS_IN_ROOM")), &globalData);
+	int filesVecSize = filesVec.size();
+
+
+	/* Kreiranje sobe (objekta) */
+	Room & room = * new Room;
+	gd.alocatedFxObjects.push_back(&room);
+	gd.objectsToDisplay.push_back(&room);
+
+	/* Postavljanmo velicinu matrice (poda) */
+	int n = stoi(roomCfg.getParameter("FLOOR_MATRIX_MIN_SIZE"));
+	if ((filesVecSize) > n*n)
+		n = ceil(sqrt(filesVecSize));
+
+	/* Floor scale coef - odredjuje razmaknutost izmedju fajlova
+	 * samim tim i konacnu velicinu soba jer oni moraju tacno da stanu
+	 * u sobu, i time je moguce skalirati sobu a zajedno i sve u njoj */
+	glm::vec3 fscaleCoef(1.0,1.0,1.0);
+	fscaleCoef.x = stof(roomCfg.getParameter("FLOOR_SCALE_X"));
+	fscaleCoef.z = stof(roomCfg.getParameter("FLOOR_SCALE_Z"));
+	float h = stof(roomCfg.getParameter("ROOM_HEIGHT"));
+	float files_h = stof(roomCfg.getParameter("FILES_HEIGHT"));
+
+	/* Postavljanje velicine sobe u odnosu na broj fajlova i floor scaleCoef */
+	room.setDimensions(glm::vec3(fscaleCoef.x*n,h,fscaleCoef.z*n));
+
+	/* Pravljenje User objekta */
+	User& user = * new User;
+	gd.alocatedFxObjects.push_back(&user);
+	/* User-u dajemo i lampu :) */
+	user.addChild(&globalData.lights["user_flashlight"]);
+
+	/* Dodavanje pokazivaca na user-a u razne vektore
+	 * koji se prosledjuju call-backovima i timer-ima */
+	gd.objectsToKeyboard.push_back(&user);
+	gd.objectsToMouseMove.push_back(&user);
+	gd.objectsToGravity.push_back(&user);
+	
+	/* Dodavanje sobe u user-ov colision list */
+	user.addToCheckColisionList(room.getColisionList());
+
+	/* Aktivni user je nas napravljeni user */
+	gd.activeUser = &user;
+
+	/* Aktivna kamera je kamera naseg user-a */
+	gd.activeCamera = user.fpsViewCamera();
+
+	/* Transliramo user-a na njegovu pocetnu poziciju */
+	user.translate(user.pointToObjectSys(glm::vec3(0,h/2.0,-0.5)*fscaleCoef));
+
+	/* Inicijalna pozicija (pocetak sobe) - Mesto od kog se zapocinje translacija fajlova po podu */
+	glm::vec3 initialPosition = glm::vec3(-(float)n/2.0f - 0.5, files_h, -0.5) * fscaleCoef;
+
+	/* Parent Directory je na kraju vektora, prvo njega dodajemo */
+	FileObject * parentDir = filesVec.back();
+	parentDir->translate(parentDir->pointToObjectSys(glm::vec3(0,files_h,-0.5)*fscaleCoef));
+
+	/* Dodavanje u potrebne liste */
+	gd.objectsToDisplay.push_back(parentDir);
+	gd.objectsToAnimation.push_back(parentDir);
+	gd.fxFiles.push_back(parentDir);
+	gd.alocatedFxObjects.push_back(parentDir);
+
+	filesVec.pop_back();
+
+	/* Prolazimio kroz "matricu" poda i dodajemo fajlove na odg. poziciju */
+	for (int i=1; i<=n; i++) {
+		for (int j=1; j<=n; j++) {
+			/* Ako nismo stigli do kraja vektora fajlova */
+			if (filesVec.size()) {
+
+				/* Uzmi fajl/direktorijum iz vektora fajlova */
+				TransformableObject * o = filesVec.back();
+
+				/* Transliraj na inicijalnu poziciju */
+				o->translate(o->vecToObjectSys(initialPosition));
+
+				/* Transliraj na sledecu slobodnu poziciju (dokle smo stigli u matrici poda) */
+				o->translate(o->vecToObjectSys(glm::vec3( (float)j, 0, -(float)i)*fscaleCoef));
+
+				/* Ubaci u listu za iscrtavanje */
+				gd.objectsToDisplay.push_back(o);
+
+				/* Ubaci u listu za animacije */
+				gd.objectsToAnimation.push_back(o);
+
+				/* Ubaci u listu fajlova */
+				gd.fxFiles.push_back(o);
+
+				/* Ubacujemo u listu alociranih objekata */
+				/* Alocirani su funkcijom File::ImportAll() */
+				gd.alocatedFxObjects.push_back(o);
+
+				/* Izbacujemo element iz vektora fajlova */
+				filesVec.pop_back();
+
+			} else {
+				/* Break ako nema vise elemenata */
+				break;
+			}
+		}
+	}
+
+	/* Alocirani fajlovi odgovaraju trenutnom direktorijumu */
+	gd.fxAlocatedDir = gd.fxCurrentDir;
 }

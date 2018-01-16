@@ -40,6 +40,7 @@ class User : public MovableObject {
 	private:
 		glm::vec3 headToBodyRatio = glm::vec3(0.275f,0.1f,0.275f);
 		glm::vec3 userToWorldRatio = glm::vec3(0.1f, 0.275f, 0.1f);
+		bool isFlashLightOn = false;
 
 	public:
 		Head userHead;
@@ -51,6 +52,8 @@ class User : public MovableObject {
 		void drawObject();
 		void processKeyboardInput(bool pressedKeys[256], int x, int y);
 		void processMouseMove(glm::vec2 delta);
+		void toggleFlashLight(bool pressedKeys[256]);
+
 		Camera * fpsViewCamera();
 };
 

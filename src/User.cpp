@@ -4,11 +4,14 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include "DataContainer.h"
 
 #include <glm/glm.hpp>
 
 #define USR_SPEED 0.25
 #define USR_JUMP 0.15
+
+extern DataContainer globalData;
 
 Head::Head() {
 	this->firstPerson.attachedTo = this;
@@ -82,6 +85,7 @@ void User::processKeyboardInput(bool pressedKeys[256], int x, int y) {
 	moveKeys(pressedKeys);
 	rotateLeftKeys(pressedKeys);
 	jumpKeys(pressedKeys);
+	toggleFlashLight(pressedKeys);
 
 	this->userHead.processKeyboardInput(pressedKeys, x, y);
 }
@@ -100,4 +104,20 @@ void User::drawObject() {
 
 Camera * User::fpsViewCamera() {
 	return &this->userHead.firstPerson;
+}
+
+void User::toggleFlashLight(bool pressedKeys[256]) {
+	char flashKey = globalData.configs["keyboard"].getParameter("TOGGLE_FLASHLIGHT").c_str()[0];
+
+	if (pressedKeys[(int) flashKey]) {
+		if (this->isFlashLightOn == false) {
+			globalData.lights["user_flashlight"].enable();
+			isFlashLightOn = true;
+		} else {
+			globalData.lights["user_flashlight"].disable();
+			isFlashLightOn = false;
+		}
+
+		globalData.pressedKeys[(int) flashKey] = false;
+	}
 }

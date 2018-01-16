@@ -7,6 +7,8 @@
 #include "TransformableObject.h"
 #include "TexturedObject.h"
 #include "User.h"
+#include "DataContainer.h"
+#include "AnimatedObject.h"
 
 /* Colidable-Transformable object */
 class CTObject : public ColidableObject, public TransformableObject {
@@ -30,6 +32,8 @@ class Room : public TransformableObject , public DrawableObject {
 
 		/* Implicitno default parametri */
 		glm::vec4 color = glm::vec4(1,1,1,1);
+
+		/* Default values */
 		Model cube = Model("resources/models/cube.obj");
 		Material material = Material("resources/materials/normal.mat");
 		Texture2D wallTexture = Texture2D("resources/textures/wall.bmp");
@@ -48,6 +52,47 @@ class Room : public TransformableObject , public DrawableObject {
 		void setDimensions(glm::vec3 lwh);
 
 		std::vector <Object *> getColisionList();
+};
+
+
+class FileObject : public TexturedObject, public ColidableObject, public AnimatedObject {
+
+	protected:
+		bool isGlowing=false;
+
+	public:
+		std::string path;
+		std::string name;
+
+		FileObject(std::string path);
+		
+		void animate();
+
+		/* Default File action */
+		virtual void action();
+		void startGlowing();
+		void stopGlowing();
+
+		static std::vector <FileObject *> importAll(std::string dirPath, int maxFiles, DataContainer * gd);
+};
+
+
+class DirectoryObject : public FileObject {
+	public:
+		DirectoryObject(std::string Path);
+
+	/* Directory action, resetuje FXSimulaciju sa drugim direktorijumom */
+	void action();
+
+};
+
+
+class RegularFileObject : public FileObject {
+	public:
+		std::string extension;
+		RegularFileObject(std::string Path);
+
+		void action();
 };
 
 #endif // SENSEFX_VARIOUS_OBJECTS_H

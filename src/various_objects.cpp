@@ -1,9 +1,18 @@
 #include "various_objects.h"
 #include "Object.h"
+#include "DataContainer.h"
+#include "ast.h"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+
+#include <regex>
+#include <experimental/filesystem>
+
+extern DataContainer globalData;
+
+namespace fs = std::experimental::filesystem;
 
 Room::Room() {
 	init();
@@ -85,4 +94,173 @@ void Room::init() {
 	this->addChild(&ceilingColider);
 
 
+}
+
+std::vector <FileObject *> FileObject::importAll(std::string dirPath, int maxFiles, DataContainer * gd) {
+
+	std::vector <FileObject *> files;
+
+	ast(fs::is_directory(dirPath), "Invalid directory path");
+
+	fs::path dirPathp = fs::path(dirPath);
+	int counter = 0;
+
+	for (auto &p : fs::directory_iterator(dirPathp)) {
+
+		if (++counter > maxFiles) {
+			break;
+		}
+
+	       	fs::path filePathp = fs::u8path(p);
+	       	std::string filePath = filePathp.u8string();
+
+	       	if (fs::is_directory(p)) {
+
+	       		DirectoryObject & dir = *new DirectoryObject(filePath);
+
+	       		/* Ako postoje parametri za ime foldera dir_xxx u mapi, postavi ih
+	       		* a ako ne - postavi default Model/Materijal/Teksturu/ za dir */
+	       		/* Model */
+	       		if (gd->models.count("dir_" + dir.name) && dir.name.length() > 0) {
+	       			dir.model = gd->models[dir.name];
+	       		} else {
+	       			dir.model = gd->models["dir_default"];
+	       		}
+
+	       		/* Materijal */
+	       		if (gd->materials.count("dir_" + dir.name) && dir.name.length() > 0) {
+	       			dir.material = gd->materials[dir.name];
+	       		} else {
+	       			dir.material = gd->materials["dir_default"];
+	       		}
+
+	       		/* Tekstura */
+	       		if (gd->textures.count("dir_" + dir.name) && dir.name.length() > 0) {
+	       			dir.texture = gd->textures[dir.name];
+	       		} else {
+	       			dir.texture = gd->textures["dir_default"];
+	       		}
+
+	       		files.push_back(&dir);
+
+	       	} else {
+	       		/* Ako nije direktorijum vec regularan fajl */
+
+	       		RegularFileObject & file = * new RegularFileObject(filePath);
+
+	       	       /* Ako postoje parametri za ekstenziju formata file_xxx, postavi ih
+	       		* a ako ne postavi default Model/Materijal/Teksturu/ za file */
+	       		/* Model */
+	       		if (gd->models.count("regfile_" + file.extension) && file.extension.length() > 0) {
+	       			file.model = gd->models["regfile_" + file.extension];
+	       		} else {
+	       			file.model = gd->models["regfile_default"];
+	       		}
+
+	       		/* Materijal */
+	       		if (gd->materials.count("regfile_" + file.extension) && file.extension.length() > 0) {
+	       			file.material = gd->materials["regfile_" + file.extension];
+	       		} else {
+	       			file.material = gd->materials["regfile_default"];
+	       		}
+
+	       		/* Tekstura */
+	       		if (gd->textures.count("regfile_" + file.extension) && file.extension.length() > 0) {
+	       			file.texture = gd->textures["regfile_" + file.extension];
+	       		} else {
+	       			file.texture = gd->textures["regfile_default"];
+	       		}
+
+	       		files.push_back(&file);
+	       	}
+	  }
+
+	/* Parent dir jos razresimo i dodamo na kraj vektora */
+	DirectoryObject & dir = *new DirectoryObject(dirPathp.parent_path());
+
+	if (gd->models.count("dir_" + dir.name) && dir.name.length() > 0) {
+		dir.model = gd->models[dir.name];
+	} else {
+		dir.model = gd->models["dir_default"];
+	}
+
+	/* Materijal */
+	if (gd->materials.count("dir_" + dir.name) && dir.name.length() > 0) {
+		dir.material = gd->materials[dir.name];
+	} else {
+		dir.material = gd->materials["dir_default"];
+	}
+
+	/* Tekstura */
+	if (gd->textures.count("dir_" + dir.name) && dir.name.length() > 0) {
+		dir.texture = gd->textures[dir.name];
+	} else {
+		dir.texture = gd->textures["dir_default"];
+	}
+
+	files.push_back(&dir);
+
+	return files;
+}
+
+FileObject::FileObject(std::string path) : path(path)  {
+
+	const std::regex regName(".*?([^\\/]+)?(\\.*)$", std::regex_constants::icase);
+
+	std::smatch match;
+
+	if (std::regex_search(this->path, match, regName)) {
+		this->name = match[1];
+	}
+}
+
+void FileObject::animate() {
+
+	this->rotate(0.22, glm::vec3(0,1,0));
+
+	if (this->animationParameter >= 2*M_PI) {
+		this->animationParameter = 0.0f;
+	}
+
+	this->animationParameter += 0.02;
+
+	this->translate(this->vecToObjectSys(glm::vec3(0, 0.0005*sin(this->animationParameter) ,0)));
+}
+
+void FileObject::startGlowing() {
+	//if (!isGlowing) {
+	//	globalData.lights["file_glowing"].setPosition(globalData.activeUser->pointToWorldSys(glm::vec3(0,0,0)));
+	//	globalData.lights["file_glowing"].enable();
+	//	this->isGlowing = true;
+	//}
+}
+
+void FileObject::stopGlowing() {
+	//if (isGlowing) {
+	//	globalData.lights["file_glowing"].disable();
+	//	this->isGlowing = false;
+	//}
+}
+
+void FileObject::action() {
+
+}
+
+RegularFileObject::RegularFileObject(std::string filePath) : FileObject(filePath) {
+	/* Odredjivanje extenzije na osnovu imena */
+	const std::regex extInName(".*?\\.(.+)", std::regex_constants::icase);
+	std::smatch matchExt;
+	if (std::regex_search(this->name, matchExt, extInName)) {
+		this->extension = matchExt[1];
+	}
+}
+
+DirectoryObject::DirectoryObject(std::string filePath) : FileObject(filePath) {}
+
+void RegularFileObject::action() {}
+void DirectoryObject::action() {
+	if (this->path.length() > 0)
+		globalData.fxCurrentDir = this->path;
+	else 
+		globalData.fxCurrentDir = "/";
 }

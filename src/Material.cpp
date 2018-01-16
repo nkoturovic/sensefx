@@ -97,4 +97,38 @@ std::map<std::string, Material> Material::importAll(std::string dirPath) {
     return matMap;
 }
 
+glm::vec4 Material::getAmbientCoefsVec4() {
+	return this->ambientCoefs;
+}
 
+glm::vec4 Material::getDiffuseCoefsVec4() {
+	return this->diffuseCoefs;
+}
+
+glm::vec4 Material::getSpecularCoefsVec4() {
+	return this->specularCoefs;
+}
+
+glm::vec4 Material::getEmissionCoefsVec4() {
+	return this->emissionCoefs;
+}
+
+void Material::setAmbientCoefs(glm::vec4 ambientCoefs) {
+	this->ambientCoefs = ambientCoefs;
+}
+
+void Material::setDiffuseCoefs(glm::vec4 diffuseCoefs) {
+	this->diffuseCoefs = diffuseCoefs;
+}
+
+void Material::setSpecularCoefs(glm::vec4 specularCoefs) {
+	this->specularCoefs = specularCoefs;
+}
+
+void Material::setEmissionCoefs(glm::vec4 emissionCoefs) {
+	this->emissionCoefs = emissionCoefs;
+}
+
+void Material::setShininess(float shininess) {
+	this->shininess = shininess;
+}

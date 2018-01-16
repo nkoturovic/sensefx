@@ -133,3 +133,9 @@ void Light::enable() {
 void Light::disable() {
 	glDisable(lightConstants[lightID]);
 }
+
+void Light::setPosition(glm::vec3 position) {
+	this->position.x = position.x;
+	this->position.y = position.y;
+	this->position.z = position.z;
+}

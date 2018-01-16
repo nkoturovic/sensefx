@@ -1,11 +1,12 @@
 #ifndef SENSEFX_LIGHT_H
 #define SENSEFX_LIGHT_H
 
+#include "Object.h"
 #include <glm/glm.hpp>
 #include <string>
 #include <map>
 
-class Light {
+class Light : public Object {
 
 	private:
 		/* Ima samo 7 Light konstanti (max 7 svetala) */
@@ -29,6 +30,8 @@ class Light {
 		float * getDiffuse();
 		float * getSpecular();
 		float * getPosition();
+
+		void setPosition(glm::vec3);
 
 		void loadLight(std::string lightPath);
 		void enable();

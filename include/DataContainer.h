@@ -36,13 +36,11 @@ class DataContainer {
 		std::vector <Object*> objectsToKeyboard; 
 		std::vector <Object*> objectsToMouseMove;
 		std::vector <Object*> objectsToGravity;
+		std::vector <Object*> objectsToAnimation;
 		std::vector <Text> textToScreenVec;
-
-		std::vector <Object *> simColisionList;
-		std::string simCurrentDir;
-
-		Camera * activeCamera;
-		User * activeUser;
+	
+		Camera * activeCamera = NULL;
+		User * activeUser = NULL;
 
 		bool pressedKeys[256];
 		int keyPressedPositionX;
@@ -62,11 +60,22 @@ class DataContainer {
 		const int gravityTimerId = 3;
 		float gravityTimerInterval = 10;
 
-		const int fxSimulationTimerId = 4;
-		float fxSimulationTimerInterval = 10;
+		const int animationTimerId = 4;
+		float animationTimerInterval = 10;
+
+		const int fxTimerId = 5;
+		float fxTimerInterval = 10;
 
 		glm::vec2 mousePosition;
-		DataContainer& operator=(DataContainer rhs);
+
+		/* Promenljive i metodi vezani za file exploring */
+		std::vector <Object *> fxFiles;
+		std::vector <Object *> alocatedFxObjects;
+
+		std::string fxAlocatedDir;
+		std::string fxCurrentDir;
+
+		void deallocFx();
 };
 
 #endif //SENSEFX_CONTAINER_H
