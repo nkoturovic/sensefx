@@ -9,13 +9,13 @@ void DataContainer::deallocFx() {
 		if (RegularFileObject * rf_o = dynamic_cast<RegularFileObject*>(o))
 			delete rf_o;
 
-		if (DirectoryObject * d_o = dynamic_cast<DirectoryObject*>(o))
+		else if (DirectoryObject * d_o = dynamic_cast<DirectoryObject*>(o))
 			delete d_o;	
 
-		if (User * u_o = dynamic_cast<User *>(o))
+		else if (User * u_o = dynamic_cast<User *>(o))
 			delete u_o;
 
-		if (Room * r_o = dynamic_cast<Room *>(o))
+		else if (Room * r_o = dynamic_cast<Room *>(o))
 			delete r_o;
 
 	});

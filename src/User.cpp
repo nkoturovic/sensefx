@@ -8,9 +8,6 @@
 
 #include <glm/glm.hpp>
 
-#define USR_SPEED 0.25
-#define USR_JUMP 0.15
-
 extern DataContainer globalData;
 
 Head::Head() {
@@ -25,7 +22,8 @@ User::User(Object * parent, float speed, float jump) : Object(parent), MovableOb
 }
 
 User::User(float speed, float jump) : User(NULL, speed, jump) {}
-User::User() : User(NULL, USR_SPEED, USR_JUMP) {}
+User::User() : User(NULL, stof(globalData.configs["user"].getParameter("SPEED")),
+		stof(globalData.configs["user"].getParameter("JUMP"))) {}
 
 
 void Head::processKeyboardInput(bool pressedKeys[256], int x, int y) {

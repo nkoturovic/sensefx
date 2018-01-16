@@ -27,6 +27,9 @@ Config::Config(std::string path) : Config(path, "DEFAULT") {}
 Config::Config() { } 
 
 std::string Config::getParameter(std::string key) {
+	if (this->parameters.count(key) == 0)
+		return "ERROR_NOT_EXIST";
+
     return this->parameters[key];
 }
 

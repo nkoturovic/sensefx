@@ -142,8 +142,8 @@ int main(int argc, char * argv[])
 	std::string dirPath = argv[1];
 	/* Obezbedjujemo da se ne zavrsava sa '/' 
 	 * jer je to invalid format */
-	if (dirPath[dirPath.size() - 1] == '/')
-		dirPath[dirPath.size()-1] = '\0';
+	//if (dirPath[dirPath.size() - 1] == '/')
+	//	dirPath[dirPath.size() - 1] = '\0';
 
 	/* Postavljamo inicijalni direktorijum i odavde
 	 * fx_timer() preuzima dalji posao oko fajlova !!! */
@@ -329,6 +329,9 @@ static void animation_timer(int value) {
 
 static void fx_timer(int value) {
 
+	if (value != globalData.fxTimerId)
+		return;
+
 	/***************************************************
 	*** Implementacija fajl explorera pocinje odavde ***
 	***************************************************/
@@ -343,9 +346,6 @@ static void fx_timer(int value) {
 	if (gd.fxAlocatedDir != gd.fxCurrentDir) {
 		fx_changedir(gd.fxCurrentDir);
 	}
-
-	if (value != globalData.fxTimerId)
-		return;
 
 
 	User * activeUser = globalData.activeUser;

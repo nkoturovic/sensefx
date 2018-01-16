@@ -35,10 +35,10 @@ class Room : public TransformableObject , public DrawableObject {
 
 		/* Default values */
 		Model cube = Model("resources/models/cube.obj");
-		Material material = Material("resources/materials/normal.mat");
-		Texture2D wallTexture = Texture2D("resources/textures/wall.bmp");
-		Texture2D floorTexture = Texture2D("resources/textures/floor.bmp");
-		Texture2D ceilingTexture = Texture2D("resources/textures/ceiling.bmp");
+		Material material;
+		Texture2D wallTexture;
+		Texture2D floorTexture;
+		Texture2D ceilingTexture;
 
 
 		float wallThickness = 0.05;

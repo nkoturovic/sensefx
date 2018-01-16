@@ -33,20 +33,54 @@ std::vector <Object *> Room::getColisionList() {
 }
 
 void Room::init() {
+
+	Config roomCfg = Config(globalData.fxCurrentDir + "/" + "sensefx.cfg");
+	Material wMat;
+	Texture2D wTex;
+	
+	std::string wallMatName;
+	if ((wallMatName = roomCfg.getParameter("WALL_MATERIAL")) != "ERROR_NOT_EXIST") {
+
+		if (globalData.materials.count(wallMatName)) {
+			wMat = globalData.materials[wallMatName];
+		} else {
+			wMat = globalData.materials["wall_default"];
+		}
+
+	} else { 
+		wMat = globalData.materials["wall_default"];
+	}
+
+
+	std::string wallTexName;
+	if ((wallTexName = roomCfg.getParameter("WALL_TEXTURE")) != "ERROR_NOT_EXIST") {
+
+		if (globalData.textures.count(wallTexName)) {
+			wTex = globalData.textures[wallTexName];
+		} else {
+			wTex = globalData.textures["wall_default"];
+		}
+
+	} else { 
+		wTex = globalData.textures["wall_default"];
+	}
+
 	frontWall.translate(glm::vec3(0,0,-1*translateCoef));
 	frontWall.scale(glm::vec3(1,1,wallThickness));
 	frontWall.setColor(color);
+
 	frontWall.model = cube;
-	frontWall.material = material;
-	frontWall.texture = wallTexture;
+	frontWall.material = wMat;
+	frontWall.texture = wTex;
+
 	this->addChild(&frontWall);
 
 	backWall.translate(glm::vec3(0,0,1*translateCoef));
 	backWall.scale(glm::vec3(1,1,wallThickness));
 	backWall.setColor(color);
 	backWall.model = cube;
-	backWall.material = material;
-	backWall.texture = wallTexture;
+	backWall.material = wMat;
+	backWall.texture = wTex;
 	this->addChild(&backWall);
 
 	leftWall.translate(glm::vec3(-1*translateCoef,0,0));
@@ -54,8 +88,8 @@ void Room::init() {
 	leftWall.scale(glm::vec3(1,1,wallThickness));
 	leftWall.setColor(color);
 	leftWall.model = cube;
-	leftWall.material = material;
-	leftWall.texture = wallTexture;
+	leftWall.material = wMat;
+	leftWall.texture = wTex;
 	this->addChild(&leftWall);
 
 	rightWall.translate(glm::vec3(1*translateCoef,0,0));
@@ -63,30 +97,89 @@ void Room::init() {
 	rightWall.scale(glm::vec3(1,1,wallThickness));
 	rightWall.setColor(color);
 	rightWall.model = cube;
-	rightWall.material = material;
-	rightWall.texture = wallTexture;
+	rightWall.material = wMat;
+	rightWall.texture = wTex;
 	this->addChild(&rightWall);
+
+
+	Material fMat;
+	Texture2D fTex;
+	
+	std::string floorMatName;
+	if ((floorMatName = roomCfg.getParameter("FLOOR_MATERIAL")) != "ERROR_NOT_EXIST") {
+
+		if (globalData.materials.count(floorMatName)) {
+			fMat = globalData.materials[floorMatName];
+		} else {
+			fMat = globalData.materials["floor_default"];
+		}
+	} else { 
+		fMat = globalData.materials["floor_default"];
+	}
+
+
+	std::string floorTexName;
+	if ((floorTexName = roomCfg.getParameter("FLOOR_TEXTURE")) != "ERROR_NOT_EXIST") {
+
+		if (globalData.textures.count(floorTexName)) {
+			fTex = globalData.textures[floorTexName];
+		} else {
+			fTex = globalData.textures["floor_default"];
+		}
+	} else { 
+		fTex = globalData.textures["floor_default"];
+	}
+
 
 	floor.translate(glm::vec3(0,-1*translateCoef,0));
 	floor.rotate(90, glm::vec3(1,0,0));
 	floor.scale(glm::vec3(1,1,wallThickness));
 	floor.setColor(color);
 	floor.model = cube;
-	floor.material = material;
-	floor.texture = floorTexture;
+	floor.material = fMat;
+	floor.texture = fTex;
 	this->addChild(&floor);
 
 	floorColider.translate(glm::vec3(0,-1*translateCoef,0));
 	floorColider.scale(glm::vec3(1,wallThickness,1));
 	this->addChild(&floorColider);
 
+	Material cMat;
+	Texture2D cTex;
+	
+	std::string ceilingMatName;
+	if ((ceilingMatName = roomCfg.getParameter("CEILING_MATERIAL")) != "ERROR_NOT_EXIST") {
+
+		if (globalData.materials.count(ceilingMatName)) {
+			cMat = globalData.materials[ceilingMatName];
+		} else {
+			cMat = globalData.materials["ceiling_default"];
+		}
+
+	} else { 
+		cMat = globalData.materials["ceiling_default"];
+	}
+
+
+	std::string ceilingTexName;
+	if ((ceilingTexName = roomCfg.getParameter("CEILING_TEXTURE")) != "ERROR_NOT_EXIST") {
+
+		if (globalData.textures.count(ceilingTexName)) {
+			cTex = globalData.textures[ceilingTexName];
+		} else {
+			cTex = globalData.textures["ceiling_default"];
+		}
+	} else { 
+		cTex = globalData.textures["ceiling_default"];
+	}
+
 	ceiling.translate(glm::vec3(0,1*translateCoef,0));
 	ceiling.rotate(90, glm::vec3(1,0,0));
 	ceiling.scale(glm::vec3(1,1,wallThickness));
 	ceiling.setColor(color);
 	ceiling.model = cube;
-	ceiling.material = material;
-	ceiling.texture = ceilingTexture;
+	ceiling.material = cMat;
+	ceiling.texture = cTex;
 	this->addChild(&ceiling);
 
 	ceilingColider.translate(glm::vec3(0,1*translateCoef,0));
@@ -102,7 +195,18 @@ std::vector <FileObject *> FileObject::importAll(std::string dirPath, int maxFil
 
 	ast(fs::is_directory(dirPath), "Invalid directory path");
 
-	fs::path dirPathp = fs::path(dirPath);
+
+	fs::path dirPathp;
+
+	if (dirPath[0] == '.' && dirPath[1] == '/') {
+		std::string fixedPath = &dirPath[1];
+		dirPathp = fs::path(fs::current_path().c_str() + fixedPath);
+	} else {
+		dirPathp = fs::absolute(dirPath);
+	}
+
+	globalData.fxCurrentDir = dirPathp.c_str();	
+
 	int counter = 0;
 
 	for (auto &p : fs::directory_iterator(dirPathp)) {
@@ -122,21 +226,21 @@ std::vector <FileObject *> FileObject::importAll(std::string dirPath, int maxFil
 	       		* a ako ne - postavi default Model/Materijal/Teksturu/ za dir */
 	       		/* Model */
 	       		if (gd->models.count("dir_" + dir.name) && dir.name.length() > 0) {
-	       			dir.model = gd->models[dir.name];
+	       			dir.model = gd->models["dir_" + dir.name];
 	       		} else {
 	       			dir.model = gd->models["dir_default"];
 	       		}
 
 	       		/* Materijal */
 	       		if (gd->materials.count("dir_" + dir.name) && dir.name.length() > 0) {
-	       			dir.material = gd->materials[dir.name];
+	       			dir.material = gd->materials["dir_" + dir.name];
 	       		} else {
 	       			dir.material = gd->materials["dir_default"];
 	       		}
 
 	       		/* Tekstura */
 	       		if (gd->textures.count("dir_" + dir.name) && dir.name.length() > 0) {
-	       			dir.texture = gd->textures[dir.name];
+	       			dir.texture = gd->textures["dir_" + dir.name];
 	       		} else {
 	       			dir.texture = gd->textures["dir_default"];
 	       		}
@@ -179,21 +283,21 @@ std::vector <FileObject *> FileObject::importAll(std::string dirPath, int maxFil
 	DirectoryObject & dir = *new DirectoryObject(dirPathp.parent_path());
 
 	if (gd->models.count("dir_" + dir.name) && dir.name.length() > 0) {
-		dir.model = gd->models[dir.name];
+		dir.model = gd->models["dir_" + dir.name];
 	} else {
 		dir.model = gd->models["dir_default"];
 	}
 
 	/* Materijal */
 	if (gd->materials.count("dir_" + dir.name) && dir.name.length() > 0) {
-		dir.material = gd->materials[dir.name];
+		dir.material = gd->materials["dir_" + dir.name];
 	} else {
 		dir.material = gd->materials["dir_default"];
 	}
 
 	/* Tekstura */
 	if (gd->textures.count("dir_" + dir.name) && dir.name.length() > 0) {
-		dir.texture = gd->textures[dir.name];
+		dir.texture = gd->textures["dir_" + dir.name];
 	} else {
 		dir.texture = gd->textures["dir_default"];
 	}
