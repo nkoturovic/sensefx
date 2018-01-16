@@ -36,7 +36,7 @@ U direktorijumu projekta ukucati:
 
 ## PREUZET KOD (tuđi):
 * Kod za učitavanje .bmp fajlova (image.h i image.cpp): [objloader](http://poincare.matf.bg.ac.rs/~ivan/files/rg/vezbe/07/32_texture.tar.bz2)
-* Kod za učitavanje .obj fajlova (objloader.h i objloader.cpp): [imgloader](http://poincare.matf.bg.ac.rs/~ivan/files/rg/vezbe/07/32_texture.tar.bz2)
+* Kod za učitavanje .obj fajlova (objloader.h i objloader.cpp): [imgloader](https://github.com/huamulan/OpenGL-tutorial/blob/master/common)
 
 ## INFO
 Za više informacija posetiti Wiki sekciju projekta: [Wiki](https://github.com/MATF-RG17/RG026-sensefx/wiki)
