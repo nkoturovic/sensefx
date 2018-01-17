@@ -249,7 +249,8 @@ static void on_mouse_move(int x, int y)
 }
 
 
-/* TAJMERI */ static void redisplay_timer(int value)
+/* TAJMERI */ 
+static void redisplay_timer(int value)
 {
 	if (value != globalData.redisplayTimerId)
 		return;
