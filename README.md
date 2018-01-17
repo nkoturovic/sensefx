@@ -35,7 +35,7 @@ U direktorijumu projekta ukucati:
 
 
 ## NAPOMENA
-* Projekat je još uvek u fazi razvoja, neke funkcionalnosti još uvek nisu implementirane, kod je potrebno dodatno "**isčistiti**" i ulepšati tj. **postoje mesta za "zlim" kodom**. Takođe velika je verovatnoća da postoje i određeni bug-ovi.
+* Projekat je još uvek u fazi razvoja, neke funkcionalnosti još uvek nisu implementirane, kod je potrebno dodatno "**isčistiti**" i ulepšati tj. postoje mesta za "**zlim kodom**". Takođe velika je verovatnoća da postoje i određeni bug-ovi.
 * Ovaj projekat je moj prvi projekat i susret sa programskim jezikom C++, do sada nisam imao iskustva sa ovim jezikom ali jesam sa drugim objektno-orijentisanim jezicima.
 
 ## Preuzet kod (tuđi):
