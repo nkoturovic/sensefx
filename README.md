@@ -1,6 +1,8 @@
 # Sense File e(X)plorer (RG26-sensefx)
 [![not found](examples_img/yt-thumbnail.png?raw=true)](https://www.youtube.com/watch?v=HEGZIUWtsqQ)
+
 **YouTube demo snimak:** [link](https://www.youtube.com/watch?v=HEGZIUWtsqQ)
+
 **MP4 demo snimak:** Postoji i demo snimak u mp4 formatu rezolucije 800x600 koji se nalazi u direktorijumu projekta examples_video.
 
 ## Requirements
