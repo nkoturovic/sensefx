@@ -352,6 +352,11 @@ static void fx_timer(int value) {
 	 * taster 'e' metod action() na fajlu se poziva (npr. ulazak u sledeci direktorijum
 	 * ovaj tajmer postoji samo za file explorer */
 
+	/********************TODO*********************************
+	*** O ovome treba jos dosta razmisliti i srediti ga!!! ***
+	*** Da li ovako, sta i kako ...                        ***
+	*********************************************************/
+
 	DataContainer &gd = globalData;
 
 	/* Proverava da li je direktorijum promenjen i
@@ -364,7 +369,7 @@ static void fx_timer(int value) {
 	User * activeUser = globalData.activeUser;
 	std::vector<Object* > colisionList = globalData.fxFiles;
 
-	for_each (colisionList.begin(), colisionList.end(), [activeUser] (Object * o) {
+	for_each (colisionList.begin(), colisionList.end(), [&activeUser, &gd] (Object * o) {
 
 
 		if(FileObject * f_o = dynamic_cast<FileObject*>(o)) {
@@ -372,9 +377,12 @@ static void fx_timer(int value) {
 			if (f_o->isColiding(activeUser)) {
 
 				/* Ovde se razresavaju tzv. Akcije fajlova */
-				if (globalData.pressedKeys[(int)'e']) {
+				Config & keyboardCfg = gd.configs["keyboard"];
+				char actionKey = keyboardCfg.getParameter("ACTION").c_str()[0]; 
+
+				if (globalData.pressedKeys[ (int) actionKey ]) {
 					f_o->action();
-					globalData.pressedKeys[(int)'e'] = false;
+					globalData.pressedKeys[ (int) actionKey] = false;
 				}
 
 				/* TODO: Formatiranje teksta da bude iz config-a eksternog */
@@ -390,12 +398,12 @@ static void fx_timer(int value) {
 				globalData.textToScreenVec.push_back(Text(glm::vec2(15,15), glm::vec3(0,1,0), fileType + ": " + f_o->name));
 
 				f_o->startAnimation();
-				f_o->startGlowing();
+				// f_o->startGlowing(); TODO: --> jos nije implementirano
 			} else {
 				/* Budemo sigurni da ni jedna vise animacija nije pustena sem
 				 * ona kada se objekti sudaraju */
 				f_o->endAnimation();
-				f_o->stopGlowing();
+				// f_o->stopGlowing(); TODO: --> jos nije implementirano
 			}
 		}
 	});
