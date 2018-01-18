@@ -125,22 +125,19 @@ int main(int argc, char * argv[])
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-	/* Deljeni globalni podaci programa */
-	DataContainer &gd = globalData;
-
 	/* Importovanje textura/modela/materijala i svetla */
-	gd.textures = Texture2D::importAll("resources/textures");
-	gd.models = Model::importAll("resources/models");
-	gd.materials = Material::importAll("resources/materials");
-	gd.lights = Light::importAll("resources/lights");
+	globalData.textures = Texture2D::importAll("resources/textures");
+	globalData.models = Model::importAll("resources/models");
+	globalData.materials = Material::importAll("resources/materials");
+	globalData.lights = Light::importAll("resources/lights");
 
 	/* Ukljucivanje svetla */
-	gd.lights["light0"].enable();
-	gd.lights["light1"].enable();
-	gd.lights["light2"].enable();
-	gd.lights["light3"].enable();
-	gd.lights["light4"].enable();
-	gd.lights["light5"].enable();
+	globalData.lights["light0"].enable();
+	globalData.lights["light1"].enable();
+	globalData.lights["light2"].enable();
+	globalData.lights["light3"].enable();
+	globalData.lights["light4"].enable();
+	globalData.lights["light5"].enable();
 	
 	std::string dirPath = argv[1];
 
@@ -171,26 +168,31 @@ static void on_display()
 	if (globalData.activeCamera != NULL)
 		glLoadMatrixf(glm::value_ptr(globalData.activeCamera->viewMatrix()));
 
-	std::vector<Object* > &objectsToDisplay = globalData.objectsToDisplay;
 	/* Sortiranje po daljini od user-a  Posto se iz vektora cita unazad,
 	 * sortiramo u obrnutom poretku, na pocetak idu najdalji - ovo je 
 	 * bitno zbog ispravne obrade providnosti objekata!! */
-	User * au = globalData.activeUser;
-	std::sort (objectsToDisplay.begin(), objectsToDisplay.end(), [au] (Object * a, Object * b) -> bool {
-		if (glm::length(au->pointToObjectSys(a, glm::vec3(0,0,0))) > glm::length(au->pointToObjectSys(b, glm::vec3(0,0,0))))
+	std::sort (globalData.objectsToDisplay.begin(), globalData.objectsToDisplay.end(), [] (Object * a, Object * b) -> bool {
+
+		float aLenght = glm::length(globalData.activeUser->pointToObjectSys(a, glm::vec3(0,0,0)));
+		float bLenght = glm::length(globalData.activeUser->pointToObjectSys(b, glm::vec3(0,0,0)));
+
+		if (aLenght > bLenght)
 			return true;
 		else
 			return false;
 	});
 
 	/* Iscrtavanje objekata */
-	for_each (objectsToDisplay.begin(), objectsToDisplay.end(), [] (Object * o) {
+	for_each (globalData.objectsToDisplay.begin(), globalData.objectsToDisplay.end(), [] (Object * o) {
+
 		if(DrawableObject * d_o = dynamic_cast<DrawableObject*>(o))
 			d_o->draw();
+
 	});
 
-	/* Tekst za trenutni direktorijum */
-	globalData.textToScreenVec.push_back(Text(glm::vec2(15.0f, globalData.screenSize.y - 25.0f), glm::vec3(1,0,0), "Exploring: " + globalData.fxCurrentDir));
+	/* Tekst za ime trenutnog (exploring) direktorijum */
+	Text dirName(glm::vec2(15.0f, globalData.screenSize.y - 25.0f), glm::vec3(1,0,0), "Exploring: " + globalData.fxCurrentDir);
+	globalData.textToScreenVec.push_back(dirName);
 
 	/* Ovde se obradjuju prosledjeni tekstovi na ekran */
 	for_each (globalData.textToScreenVec.begin(), globalData.textToScreenVec.end(), [] (Text t) {
@@ -263,8 +265,7 @@ static void keyboard_timer(int value)
 		return;
 
 	/* Obradjivanje zahteva za tastatru */
-	std::vector<Object* > &objectsToKeyboard = globalData.objectsToKeyboard;
-	for_each (objectsToKeyboard.begin(), objectsToKeyboard.end(), [] (Object * o) {
+	for_each (globalData.objectsToKeyboard.begin(), globalData.objectsToKeyboard.end(), [] (Object * o) {
 		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o))
 			m_o->processKeyboardInput(globalData.pressedKeys, globalData.keyPressedPositionX, globalData.keyPressedPositionY);
 	});
@@ -285,8 +286,7 @@ static void mouse_timer(int value)
 
 	glm::vec2 delta = center-mousePosition;
 
-	std::vector<Object* > &objectsToMouseMove = globalData.objectsToMouseMove;
-	for_each (objectsToMouseMove.begin(), objectsToMouseMove.end(), [delta] (Object * o) {
+	for_each (globalData.objectsToMouseMove.begin(), globalData.objectsToMouseMove.end(), [delta] (Object * o) {
 		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o)) 
 			m_o->processMouseMove(delta);
 	});
@@ -302,13 +302,14 @@ static void gravity_timer(int value)
 		return;
 
 	/* Pad objekata kojima je pridruzena gravitacija i nisu na podu */
-	std::vector<Object* > &toGravity = globalData.objectsToGravity;
-	for_each (toGravity.begin(), toGravity.end(), [] (Object * o) {
+	for_each (globalData.objectsToGravity.begin(), globalData.objectsToGravity.end(), [] (Object * o) {
+
 		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o)) {
 			float gravity = -stof(globalData.configs["gravity"].getParameter("GRAVITY"));
 			m_o->addToVelocity(glm::vec3(0.0f, gravity, 0.0f));
 			m_o->move(m_o->getVelocity());
 		}
+
 	});
 
 	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
@@ -324,12 +325,13 @@ static void animation_timer(int value) {
 	if (value != globalData.animationTimerId)
 		return;
 	
-	std::vector<Object* > &toAnimation = globalData.objectsToAnimation;
-	for_each (toAnimation.begin(), toAnimation.end(), [] (Object * o) {
+	for_each (globalData.objectsToAnimation.begin(), globalData.objectsToAnimation.end(), [] (Object * o) {
+
 		if(AnimatedObject* a_o = dynamic_cast<AnimatedObject*>(o)) {
 			if (a_o->isAnimationOngoing())
 				a_o->animate();
 		}
+
 	});
 
 	glutTimerFunc(globalData.animationTimerInterval, animation_timer, globalData.animationTimerId);
