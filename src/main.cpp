@@ -123,8 +123,6 @@ int main(int argc, char * argv[])
 
 	/* Ukljucivanje providnosti objekata */
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
 	glEnable(GL_BLEND);
 
 	/* Deljeni globalni podaci programa */
@@ -357,20 +355,32 @@ static void fx_timer(int value) {
 	*** Da li ovako, sta i kako ...                        ***
 	*********************************************************/
 
+	/* Vazi pravilo - Obicno sto je veci komentar kod je losiji, a ovde je komentar veliki */
+
 	DataContainer &gd = globalData;
 
 	/* Proverava da li je direktorijum promenjen i
-	 * puni globalData (memoriju) potrebnim podacima */
+	 * puni globalData (memoriju) potrebnim podacima 
+	 * sto je razreseno u fx_changedir() funkciji */
 	if (gd.fxAlocatedDir != gd.fxCurrentDir) {
 		fx_changedir(gd.fxCurrentDir);
 	}
 
 
+	/* Zabelezimo informaciju ko je aktivni korisnik jer nam treba u lambdi ispod */
 	User * activeUser = globalData.activeUser;
+
+	/* Uzmemo listu svih fajlova */
 	std::vector<Object* > colisionList = globalData.fxFiles;
 
-	for_each (colisionList.begin(), colisionList.end(), [&activeUser, &gd] (Object * o) {
+	/* Sad gledamo da li se neki od fajlova sudara sa User-om, ako se sudara onda treba da 
+	 * se rotira (tj. da se pokrene animacija i ostale potrebne stvari */
+	for_each (colisionList.begin(), colisionList.end(), [activeUser, &gd] (Object * o) {
 
+		/* TODO: Ovakve stvari (prolazak kroz sve fajlove verovatno jedu performanse 
+		 * ovde treba mozda neki break - prestanak for_each na neki nacin 
+		 * koji ce kod prvog isColiding=TRUE sa objektom - break-ovati petlju for_each
+		 * da li je uopste moguce break-ovati for_each ?? */
 
 		if(FileObject * f_o = dynamic_cast<FileObject*>(o)) {
 			
@@ -388,6 +398,7 @@ static void fx_timer(int value) {
 				/* TODO: Formatiranje teksta da bude iz config-a eksternog */
 				/* Ispisujemo ime fajla na ekranu */
 
+				/* Ovde uzimamo tip fajla, zatim i ime i ispisujemo tekst u donjem levom uglu ekrana */
 				std::string fileType = "File";
 				if (dynamic_cast<DirectoryObject*>(o)) {
 					fileType = "Directory";	
@@ -395,8 +406,10 @@ static void fx_timer(int value) {
 					fileType = "File";
 				}
 
+				/* Stavljamo tekst u listu tekstova koji cekaju na ispis */
 				globalData.textToScreenVec.push_back(Text(glm::vec2(15,15), glm::vec3(0,1,0), fileType + ": " + f_o->name));
 
+				/* Animacija rotiranja i transliranja gore/dole */
 				f_o->startAnimation();
 				// f_o->startGlowing(); TODO: --> jos nije implementirano
 			} else {
@@ -418,7 +431,7 @@ static void fx_changedir(std::string newDir) {
 
 	DataContainer &gd = globalData;
 	/* Ukoliko postoje fajlovi simulacije je vec postojala
-	 * ukloni ih! prethodne promenljive simulacije (dealociraj) */
+	 * ukloni ih! prethodne promenljive fx simulacije (dealociraj) */
 	if (gd.fxFiles.size()) 
 		gd.deallocFx();
 
@@ -431,6 +444,7 @@ static void fx_changedir(std::string newDir) {
 	/* Config za sobu je */
 	Config & roomCfg = gd.configs["room"];
 
+	/* Ucitavamo fajlove - maksimalno do MAX_OBJECTS_IN_ROOM iz room.cfg */
 	std::vector <FileObject *> filesVec = FileObject::importAll(newDir, stoi(roomCfg.getParameter("MAX_OBJECTS_IN_ROOM")), &globalData);
 	int filesVecSize = filesVec.size();
 
