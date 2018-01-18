@@ -293,7 +293,11 @@ static void mouse_timer(int value)
 	if (value != globalData.mouseTimerId)
 		return;
 
-	glm::vec2 center = globalData.screenSize/2.0f;
+	/* TODO: Ovde lepse resenje !!!! */
+	GLint m_viewport[4];
+	glGetIntegerv( GL_VIEWPORT, m_viewport );
+
+	glm::vec2 center(m_viewport[2]/2, m_viewport[3]/2);
 	glm::vec2 mousePosition = globalData.mousePosition;
 
 	glm::vec2 delta = center-mousePosition;
