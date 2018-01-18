@@ -22,6 +22,7 @@ DrawableObject::DrawableObject() : DrawableObject(glm::vec4(1,1,1,1)) {}
 void DrawableObject::draw() {
 	glPushMatrix();
 
+		/* ----------------------------> PRESKOCITI POCETAK <------------------------*/
 		/* Iscrtava mrezu (kocku) oko "prostora" objekata - uncomment */
 		//drawSurroundingGrid();
 		
@@ -47,8 +48,15 @@ void DrawableObject::draw() {
 				glScalef(scale.x, scale.y, scale.z);
 			}
 		}
+		/* ----------------------------> PRESKOCITI KRAJ <---------------------------*/
 
-		/* Mnozenje tekuce ModelView matrice (transformise se prostor) */
+		/******************************************/
+		/* BITNOO!! Ovo je ideja ovog draw metoda *
+		 * ***************************************/
+		/* Mnozenje tekuce ModelView matrice sa pozicionom matricom
+		 * objekta (matricom relativne pozicije u odnosu na roditelja)
+		 * (transformise se prostor) */
+
 		glMatrixMode(GL_MODELVIEW);
 		glMultMatrixf(positioningMatrix);
 

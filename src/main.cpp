@@ -225,9 +225,12 @@ static void on_keyboard(unsigned char c, int x, int y)
 	/* U switch-u se obradjuju komande koje ne uticu na
 	 * pojedinacne objekte vec na ceo program */
 	switch (c) {
+
+		/* 27 -> ESC_KEY */
 		case 27: 
 			globalData.deallocFx();
 			exit(EXIT_SUCCESS);
+
 	}
 	
 	/* Belezimo key koji je pritisnut tj. belezimo 
