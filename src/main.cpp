@@ -196,7 +196,9 @@ static void on_display()
 
 	/* Ovde se obradjuju prosledjeni tekstovi na ekran */
 	for_each (globalData.textToScreenVec.begin(), globalData.textToScreenVec.end(), [] (Text t) {
+
 		t.print(globalData.screenSize);
+
 	});
 
 	/* Ispisani tekst se brise */
@@ -266,8 +268,10 @@ static void keyboard_timer(int value)
 
 	/* Obradjivanje zahteva za tastatru */
 	for_each (globalData.objectsToKeyboard.begin(), globalData.objectsToKeyboard.end(), [] (Object * o) {
+
 		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o))
 			m_o->processKeyboardInput(globalData.pressedKeys, globalData.keyPressedPositionX, globalData.keyPressedPositionY);
+
 	});
 
 	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
@@ -287,8 +291,10 @@ static void mouse_timer(int value)
 	glm::vec2 delta = center-mousePosition;
 
 	for_each (globalData.objectsToMouseMove.begin(), globalData.objectsToMouseMove.end(), [delta] (Object * o) {
+
 		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o)) 
 			m_o->processMouseMove(delta);
+
 	});
 
 	glutWarpPointer( center.x , center.y );
@@ -359,25 +365,19 @@ static void fx_timer(int value) {
 
 	/* Vazi pravilo - Obicno sto je veci komentar kod je losiji, a ovde je komentar veliki */
 
-	DataContainer &gd = globalData;
-
 	/* Proverava da li je direktorijum promenjen i
 	 * puni globalData (memoriju) potrebnim podacima 
 	 * sto je razreseno u fx_changedir() funkciji */
-	if (gd.fxAlocatedDir != gd.fxCurrentDir) {
-		fx_changedir(gd.fxCurrentDir);
+	if (globalData.fxAlocatedDir != globalData.fxCurrentDir) {
+		fx_changedir(globalData.fxCurrentDir);
 	}
-
-
-	/* Zabelezimo informaciju ko je aktivni korisnik jer nam treba u lambdi ispod */
-	User * activeUser = globalData.activeUser;
 
 	/* Uzmemo listu svih fajlova */
 	std::vector<Object* > colisionList = globalData.fxFiles;
 
 	/* Sad gledamo da li se neki od fajlova sudara sa User-om, ako se sudara onda treba da 
 	 * se rotira (tj. da se pokrene animacija i ostale potrebne stvari */
-	for_each (colisionList.begin(), colisionList.end(), [activeUser, &gd] (Object * o) {
+	for_each (colisionList.begin(), colisionList.end(), [] (Object * o) {
 
 		/* TODO: Ovakve stvari (prolazak kroz sve fajlove verovatno jedu performanse 
 		 * ovde treba mozda neki break - prestanak for_each na neki nacin 
@@ -386,10 +386,10 @@ static void fx_timer(int value) {
 
 		if(FileObject * f_o = dynamic_cast<FileObject*>(o)) {
 			
-			if (f_o->isColiding(activeUser)) {
+			if (f_o->isColiding(globalData.activeUser)) {
 
 				/* Ovde se razresavaju tzv. Akcije fajlova */
-				Config & keyboardCfg = gd.configs["keyboard"];
+				Config & keyboardCfg = globalData.configs["keyboard"];
 				char actionKey = keyboardCfg.getParameter("ACTION").c_str()[0]; 
 
 				if (globalData.pressedKeys[ (int) actionKey ]) {
@@ -431,11 +431,10 @@ static void fx_timer(int value) {
 /* Funkcija koja menja/ucitava direktorijum */
 static void fx_changedir(std::string newDir) {
 
-	DataContainer &gd = globalData;
 	/* Ukoliko postoje fajlovi simulacije je vec postojala
 	 * ukloni ih! prethodne promenljive fx simulacije (dealociraj) */
-	if (gd.fxFiles.size()) 
-		gd.deallocFx();
+	if (globalData.fxFiles.size()) 
+		globalData.deallocFx();
 
 	/* Loading screen on directory change */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -444,7 +443,7 @@ static void fx_changedir(std::string newDir) {
 	glutSwapBuffers();
 
 	/* Config za sobu je */
-	Config & roomCfg = gd.configs["room"];
+	Config & roomCfg = globalData.configs["room"];
 
 	/* Ucitavamo fajlove - maksimalno do MAX_OBJECTS_IN_ROOM iz room.cfg */
 	std::vector <FileObject *> filesVec = FileObject::importAll(newDir, stoi(roomCfg.getParameter("MAX_OBJECTS_IN_ROOM")), &globalData);
@@ -453,8 +452,8 @@ static void fx_changedir(std::string newDir) {
 
 	/* Kreiranje sobe (objekta) */
 	Room & room = * new Room;
-	gd.alocatedFxObjects.push_back(&room);
-	gd.objectsToDisplay.push_back(&room);
+	globalData.alocatedFxObjects.push_back(&room);
+	globalData.objectsToDisplay.push_back(&room);
 
 	/* Postavljanmo velicinu matrice (poda) */
 	int n = stoi(roomCfg.getParameter("FLOOR_MATRIX_MIN_SIZE"));
@@ -475,24 +474,24 @@ static void fx_changedir(std::string newDir) {
 
 	/* Pravljenje User objekta */
 	User& user = * new User;
-	gd.alocatedFxObjects.push_back(&user);
+	globalData.alocatedFxObjects.push_back(&user);
 	/* User-u dajemo i lampu :) */
 	user.addChild(&globalData.lights["user_flashlight"]);
 
 	/* Dodavanje pokazivaca na user-a u razne vektore
 	 * koji se prosledjuju call-backovima i timer-ima */
-	gd.objectsToKeyboard.push_back(&user);
-	gd.objectsToMouseMove.push_back(&user);
-	gd.objectsToGravity.push_back(&user);
+	globalData.objectsToKeyboard.push_back(&user);
+	globalData.objectsToMouseMove.push_back(&user);
+	globalData.objectsToGravity.push_back(&user);
 	
 	/* Dodavanje sobe u user-ov colision list */
 	user.addToCheckColisionList(room.getColisionList());
 
 	/* Aktivni user je nas napravljeni user */
-	gd.activeUser = &user;
+	globalData.activeUser = &user;
 
 	/* Aktivna kamera je kamera naseg user-a */
-	gd.activeCamera = user.fpsViewCamera();
+	globalData.activeCamera = user.fpsViewCamera();
 
 	/* Transliramo user-a na njegovu pocetnu poziciju */
 	user.translate(user.pointToObjectSys(glm::vec3(0,h/2.0,-0.5)*fscaleCoef));
@@ -505,10 +504,10 @@ static void fx_changedir(std::string newDir) {
 	parentDir->translate(parentDir->pointToObjectSys(glm::vec3(0,files_h,-0.5)*fscaleCoef));
 
 	/* Dodavanje u potrebne liste */
-	gd.objectsToDisplay.push_back(parentDir);
-	gd.objectsToAnimation.push_back(parentDir);
-	gd.fxFiles.push_back(parentDir);
-	gd.alocatedFxObjects.push_back(parentDir);
+	globalData.objectsToDisplay.push_back(parentDir);
+	globalData.objectsToAnimation.push_back(parentDir);
+	globalData.fxFiles.push_back(parentDir);
+	globalData.alocatedFxObjects.push_back(parentDir);
 
 	filesVec.pop_back();
 
@@ -528,17 +527,17 @@ static void fx_changedir(std::string newDir) {
 				o->translate(o->vecToObjectSys(glm::vec3( (float)j, 0, -(float)i)*fscaleCoef));
 
 				/* Ubaci u listu za iscrtavanje */
-				gd.objectsToDisplay.push_back(o);
+				globalData.objectsToDisplay.push_back(o);
 
 				/* Ubaci u listu za animacije */
-				gd.objectsToAnimation.push_back(o);
+				globalData.objectsToAnimation.push_back(o);
 
 				/* Ubaci u listu fajlova */
-				gd.fxFiles.push_back(o);
+				globalData.fxFiles.push_back(o);
 
 				/* Ubacujemo u listu alociranih objekata */
 				/* Alocirani su funkcijom File::ImportAll() */
-				gd.alocatedFxObjects.push_back(o);
+				globalData.alocatedFxObjects.push_back(o);
 
 				/* Izbacujemo element iz vektora fajlova */
 				filesVec.pop_back();
@@ -551,5 +550,5 @@ static void fx_changedir(std::string newDir) {
 	}
 
 	/* Alocirani fajlovi odgovaraju trenutnom direktorijumu */
-	gd.fxAlocatedDir = gd.fxCurrentDir;
+	globalData.fxAlocatedDir = globalData.fxCurrentDir;
 }
