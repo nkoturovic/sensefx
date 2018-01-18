@@ -34,7 +34,7 @@ void DrawableObject::draw() {
 		glm::mat4 transformation = this->getPositioningMatrix(); // your transformation matrix.
 		const float * positioningMatrix = glm::value_ptr(transformation);
 
-		/* TODO: BUGFIX TEKSTURE*/
+		/* TODO: BUGFIX TEKSTURE -- Ovo definitivno treba razmisliti i srediti */
 		/* Skaliramo teksture za repeatable (bio je BUG) razvlacenja */
 		if(TexturedObject* t_o = dynamic_cast<TexturedObject*>(this)) {
 			if (t_o->texture.isRepeatingS() || t_o->texture.isRepeatingT()) {

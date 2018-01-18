@@ -31,18 +31,12 @@
 #include "objloader.h"
 #include "Model.h"
 
-/* CAMERA */
-#include "Camera.h"
-
-/* TEXTURE2D */
 #include "Texture.h"
 #include "Material.h"
-
 #include "Light.h"
 
-/* RAD sa direktorijumom */
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+/* CAMERA */
+#include "Camera.h"
 
 using namespace std;
 
@@ -176,10 +170,10 @@ static void on_display()
 		/* TODO: Ovo da bi bilo generalnije treba da bude daljina od kamere a ne od user-a 
 		 * -> Od user-a je okej ako je kamera vezana za user-a, a ako se veze za neki drugi 
 		 *  objekat ili neki drugi tip kamere bude (ne First Person) ovo nece valjati */
-		float aLenght = glm::length(globalData.activeUser->pointToObjectSys(a, glm::vec3(0,0,0)));
-		float bLenght = glm::length(globalData.activeUser->pointToObjectSys(b, glm::vec3(0,0,0)));
+		float aDistanceFromUser = glm::length(globalData.activeUser->pointToObjectSys(a, glm::vec3(0,0,0)));
+		float bDistanceFromUser = glm::length(globalData.activeUser->pointToObjectSys(b, glm::vec3(0,0,0)));
 
-		if (aLenght > bLenght)
+		if (aDistanceFromUser > bDistanceFromUser)
 			return true;
 		else
 			return false;
@@ -194,7 +188,7 @@ static void on_display()
 	});
 
 	/* Tekst za ime trenutnog (exploring) direktorijum */
-	Text dirName(glm::vec2(15.0f, globalData.screenSize.y - 25.0f), glm::vec3(1,0,0), "Exploring: " + globalData.fxCurrentDir);
+	Text dirName(glm::vec2(15.0, globalData.screenSize.y - 25.0), glm::vec3(1,0,0), "Exploring: " + globalData.fxCurrentDir);
 	globalData.textToScreenVec.push_back(dirName);
 
 	/* Ovde se obradjuju prosledjeni tekstovi na ekran */
@@ -296,10 +290,7 @@ static void mouse_timer(int value)
 	if (value != globalData.mouseTimerId)
 		return;
 
-	GLint m_viewport[4];
-	glGetIntegerv( GL_VIEWPORT, m_viewport );
-
-	glm::vec2 center(m_viewport[2]/2, m_viewport[3]/2);
+	glm::vec2 center = globalData.screenSize/2.0f;
 	glm::vec2 mousePosition = globalData.mousePosition;
 
 	glm::vec2 delta = center-mousePosition;
@@ -326,7 +317,7 @@ static void gravity_timer(int value)
 
 		if(MovableObject* m_o = dynamic_cast<MovableObject*>(o)) {
 			float gravity = -stof(globalData.configs["gravity"].getParameter("GRAVITY"));
-			m_o->addToVelocity(glm::vec3(0.0f, gravity, 0.0f));
+			m_o->addToVelocity(glm::vec3(0.0, gravity, 0.0));
 			m_o->move(m_o->getVelocity());
 		}
 
@@ -452,7 +443,7 @@ static void fx_changedir(std::string newDir) {
 
 	/* Loading screen on directory change */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	Text loading(glm::vec2(globalData.screenSize.x/2.0f - 100, globalData.screenSize.y/2.0f), glm::vec3(1,1,1), "Loading, please wait . . . ");
+	Text loading(glm::vec2(globalData.screenSize.x/2.0 - 100.0, globalData.screenSize.y/2.0), glm::vec3(1,1,1), "Loading, please wait . . . ");
 	loading.print(globalData.screenSize);	
 	glutSwapBuffers();
 
@@ -511,7 +502,7 @@ static void fx_changedir(std::string newDir) {
 	user.translate(user.pointToObjectSys(glm::vec3(0,h/2.0,-0.5)*fscaleCoef));
 
 	/* Inicijalna pozicija (pocetak sobe) - Mesto od kog se zapocinje translacija fajlova po podu */
-	glm::vec3 initialPosition = glm::vec3(-(float)n/2.0f - 0.5, files_h, -0.5) * fscaleCoef;
+	glm::vec3 initialPosition = glm::vec3(-(float)n/2.0 - 0.5, files_h, -0.5) * fscaleCoef;
 
 	/* Parent Directory je na kraju vektora, prvo njega dodajemo */
 	FileObject * parentDir = filesVec.back();
