@@ -44,6 +44,9 @@ U direktorijumu projekta ukucati:
 
     configs/mouse.cfg
 
+## Izgled prostorije (sobe) 
+Izgled sobe target_dir se podešava u config fajlu: `target_dir/sensefx.cfg`, pogledati detaljan primer u [Wiki](https://github.com/MATF-RG17/RG026-sensefx/wiki) sekciji projekta.
+
 ## NAPOMENA
 * Projekat je još uvek u fazi razvoja, neke funkcionalnosti još uvek nisu implementirane, kod je potrebno dodatno "**isčistiti**" i ulepšati tj. postoje mesta sa "**zlim kodom**". Takođe velika je verovatnoća da postoje i određeni bug-ovi.
 * Ovaj projekat je moj prvi projekat i susret sa programskim jezikom C++, do sada nisam imao iskustva sa ovim jezikom ali jesam sa drugim objektno-orijentisanim jezicima.
