@@ -173,6 +173,9 @@ static void on_display()
 	 * bitno zbog ispravne obrade providnosti objekata!! */
 	std::sort (globalData.objectsToDisplay.begin(), globalData.objectsToDisplay.end(), [] (Object * a, Object * b) -> bool {
 
+		/* TODO: Ovo da bi bilo generalnije treba da bude daljina od kamere a ne od user-a 
+		 * -> Od user-a je okej ako je kamera vezana za user-a, a ako se veze za neki drugi 
+		 *  objekat ili neki drugi tip kamere bude (ne First Person) ovo nece valjati */
 		float aLenght = glm::length(globalData.activeUser->pointToObjectSys(a, glm::vec3(0,0,0)));
 		float bLenght = glm::length(globalData.activeUser->pointToObjectSys(b, glm::vec3(0,0,0)));
 
@@ -232,21 +235,32 @@ static void on_keyboard(unsigned char c, int x, int y)
 			globalData.deallocFx();
 			exit(EXIT_SUCCESS);
 	}
-
+	
+	/* Belezimo key koji je pritisnut tj. belezimo 
+	 * u nase globalne podatke da je pritisnut i
+	 * na kojoj poziciji je pritisnut (x,y)*/
 	globalData.pressedKeys[c] = true;
+
+	/* TODO: Iskoristiti za poziciju glm::vec2 */
 	globalData.keyPressedPositionX = x;
 	globalData.keyPressedPositionY = y;
 }
 
 static void on_keyboard_release(unsigned char c, int x, int y)
 {
+	/* Belezimo key koji je pusten tj. belezimo
+	 * u nase globalne podatke da je pusten i
+	 * na kojoj poziciji je pusten (x,y)*/
 	globalData.pressedKeys[c] = false;
+
+	/* TODO: Iskoristiti za poziciju glm::vec2 */
 	globalData.keyReleasedPositionX = x;
 	globalData.keyReleasedPositionY = y;
 }
 
 static void on_mouse_move(int x, int y) 
 {
+	/* Belezimo poziciju misa u globalne podatke */
 	globalData.mousePosition = glm::vec2(x,y);
 }
 
