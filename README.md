@@ -23,6 +23,9 @@ U direktorijumu projekta ukucati:
 
 ## Kontrole
 ### Tastatura
+
+**Default kontrole:**
+
 | Key              | funkcija                         |
 | ---------------- |:--------------------------------:|
 | w,s,a,d          | Kretanje                         |
@@ -31,8 +34,15 @@ U direktorijumu projekta ukucati:
 | space            | Skok                             |
 | f                | Uključivanje/Isključivanje lampe |
 
+**Custom kontrole:** Custom kontrole možete podesiti u config fajlu:
+
+    configs/keyboard.cfg
+
 **Miš** - Look around (rotiranje kamere)
 
+**Senzitivitet:** Senzitivtet možete podesiti u config fajlu:
+
+    configs/mouse.cfg
 
 ## NAPOMENA
 * Projekat je još uvek u fazi razvoja, neke funkcionalnosti još uvek nisu implementirane, kod je potrebno dodatno "**isčistiti**" i ulepšati tj. postoje mesta sa "**zlim kodom**". Takođe velika je verovatnoća da postoje i određeni bug-ovi.
