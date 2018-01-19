@@ -61,6 +61,8 @@ static void animation_timer(int value);
 static void fx_timer(int value);
 
 /* Pomocne funkcije */
+void pauseTimers();
+void unpauseTimers();
 static void fx_changedir(std::string newDir);
 
 int main(int argc, char * argv[])
@@ -226,6 +228,15 @@ static void on_keyboard(unsigned char c, int x, int y)
 	 * pojedinacne objekte vec na ceo program */
 	switch (c) {
 
+		/* TODO: Pause key iz config-a - mozda, za sada problem constexpr */
+		case 'p': 
+			if (!globalData.timersPaused)
+				pauseTimers();
+			else
+				unpauseTimers();
+
+			break;
+
 		/* 27 -> ESC_KEY */
 		case 27: 
 			globalData.deallocFx();
@@ -265,7 +276,7 @@ static void on_mouse_move(int x, int y)
 /* TAJMERI */ 
 static void redisplay_timer(int value)
 {
-	if (value != globalData.redisplayTimerId)
+	if (value != globalData.redisplayTimerId || globalData.timersPaused)
 		return;
 
 	glutPostRedisplay();
@@ -274,7 +285,7 @@ static void redisplay_timer(int value)
 
 static void keyboard_timer(int value) 
 {
-	if (value != globalData.keyboardTimerId)
+	if (value != globalData.keyboardTimerId || globalData.timersPaused)
 		return;
 
 	/* Obradjivanje zahteva za tastatru */
@@ -290,7 +301,7 @@ static void keyboard_timer(int value)
 
 static void mouse_timer(int value) 
 {
-	if (value != globalData.mouseTimerId)
+	if (value != globalData.mouseTimerId || globalData.timersPaused)
 		return;
 
 	/* TODO: Ovde lepse resenje !!!! */
@@ -316,7 +327,7 @@ static void mouse_timer(int value)
 
 static void gravity_timer(int value)
 {
-	if (value != globalData.gravityTimerId)
+	if (value != globalData.gravityTimerId || globalData.timersPaused)
 		return;
 
 	/* Pad objekata kojima je pridruzena gravitacija i nisu na podu */
@@ -334,13 +345,13 @@ static void gravity_timer(int value)
 }
 
 
-static void animation_timer(int value) {
-
+static void animation_timer(int value) 
+{
 	/* Ovaj tajmer moze da se shvati kao tajmer za sve poslove file explorer simulacije,
 	 * ovde je ubacen za razresavanje kolizije sa objektima, za neku drugu simulaciju 
 	 * ovaj tajmer postoji samo za file explorer */
 
-	if (value != globalData.animationTimerId)
+	if (value != globalData.animationTimerId || globalData.timersPaused)
 		return;
 	
 	for_each (globalData.objectsToAnimation.begin(), globalData.objectsToAnimation.end(), [] (Object * o) {
@@ -356,9 +367,47 @@ static void animation_timer(int value) {
 
 }
 
-static void fx_timer(int value) {
+void pauseTimers() 
+{
+	globalData.timersPaused = true;
 
-	if (value != globalData.fxTimerId)
+	/* Prikazivanje kursor-a */
+	glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+
+	// TODO: Uncomment kada se pause key implementira
+	//string pauseKey = globalData.configs["keyboard"].getParameter("PAUSE");
+	// + Ovaj pause text da postoji neki config tipa messages, pa da se iz toga citaju poruke 
+	
+	Text pauseMsg(glm::vec2(globalData.screenSize.x/2.0 - 170.0, globalData.screenSize.y/2.0), glm::vec3(1,0,0), "Pause is set, to unpause press 'p' key");
+	globalData.textToScreenVec.push_back(pauseMsg);
+
+
+	glutPostRedisplay();
+}
+
+void unpauseTimers() 
+{
+	globalData.timersPaused = false;
+
+	/* Sakrivanje kursor-a */
+	glutSetCursor(GLUT_CURSOR_NONE);
+
+	/* Tajmeri */
+	glutTimerFunc(globalData.redisplayTimerInterval, redisplay_timer, globalData.redisplayTimerId);
+	glutTimerFunc(globalData.mouseTimerInterval, mouse_timer, globalData.mouseTimerId);
+	glutTimerFunc(globalData.keyboardTimerInterval, keyboard_timer, globalData.keyboardTimerId);
+	glutTimerFunc(globalData.gravityTimerInterval, gravity_timer, globalData.gravityTimerId);
+	glutTimerFunc(globalData.animationTimerInterval, animation_timer, globalData.animationTimerId);
+
+	/* FX Simulation timer */
+	glutTimerFunc(globalData.fxTimerInterval, fx_timer, globalData.fxTimerId);
+}
+
+
+static void fx_timer(int value)
+{
+
+	if (value != globalData.fxTimerId || globalData.timersPaused)
 		return;
 
 	/***************************************************

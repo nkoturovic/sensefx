@@ -48,6 +48,8 @@ class DataContainer {
 		int keyReleasedPositionX;
 		int keyReleasedPositionY;
 
+		bool timersPaused = false;
+
 		const int redisplayTimerId = 0;
 		float redisplayTimerInterval = 10;
 

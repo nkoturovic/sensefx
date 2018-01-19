@@ -33,6 +33,7 @@ U direktorijumu projekta ukucati:
 | e                | Ulazak u direktorijum            |
 | space            | Skok                             |
 | f                | Uključivanje/Isključivanje lampe |
+| p                | Pauziraj/Nastavi izvrsavanje     |
 
 **Custom kontrole:** Custom kontrole možete podesiti u config fajlu:
 
