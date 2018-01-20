@@ -61,8 +61,8 @@ static void animation_timer(int value);
 static void fx_timer(int value);
 
 /* Pomocne funkcije */
-void pauseTimers();
-void unpauseTimers();
+static void pauseTimers();
+static void unpauseTimers();
 static void fx_changedir(std::string newDir);
 
 int main(int argc, char * argv[])
@@ -230,7 +230,7 @@ static void on_keyboard(unsigned char c, int x, int y)
 
 		/* TODO: Pause key iz config-a - mozda, za sada problem constexpr */
 		case 'p': 
-			if (!globalData.timersPaused)
+			if (globalData.timersActive)
 				pauseTimers();
 			else
 				unpauseTimers();
@@ -276,7 +276,7 @@ static void on_mouse_move(int x, int y)
 /* TAJMERI */ 
 static void redisplay_timer(int value)
 {
-	if (value != globalData.redisplayTimerId || globalData.timersPaused)
+	if (value != globalData.redisplayTimerId || !globalData.timersActive)
 		return;
 
 	glutPostRedisplay();
@@ -285,7 +285,7 @@ static void redisplay_timer(int value)
 
 static void keyboard_timer(int value) 
 {
-	if (value != globalData.keyboardTimerId || globalData.timersPaused)
+	if (value != globalData.keyboardTimerId || !globalData.timersActive)
 		return;
 
 	/* Obradjivanje zahteva za tastatru */
@@ -301,7 +301,7 @@ static void keyboard_timer(int value)
 
 static void mouse_timer(int value) 
 {
-	if (value != globalData.mouseTimerId || globalData.timersPaused)
+	if (value != globalData.mouseTimerId || !globalData.timersActive)
 		return;
 
 	/* TODO: Ovde lepse resenje !!!! */
@@ -327,7 +327,7 @@ static void mouse_timer(int value)
 
 static void gravity_timer(int value)
 {
-	if (value != globalData.gravityTimerId || globalData.timersPaused)
+	if (value != globalData.gravityTimerId || !globalData.timersActive)
 		return;
 
 	/* Pad objekata kojima je pridruzena gravitacija i nisu na podu */
@@ -351,7 +351,7 @@ static void animation_timer(int value)
 	 * ovde je ubacen za razresavanje kolizije sa objektima, za neku drugu simulaciju 
 	 * ovaj tajmer postoji samo za file explorer */
 
-	if (value != globalData.animationTimerId || globalData.timersPaused)
+	if (value != globalData.animationTimerId || !globalData.timersActive)
 		return;
 	
 	for_each (globalData.objectsToAnimation.begin(), globalData.objectsToAnimation.end(), [] (Object * o) {
@@ -367,9 +367,9 @@ static void animation_timer(int value)
 
 }
 
-void pauseTimers() 
+static void pauseTimers() 
 {
-	globalData.timersPaused = true;
+	globalData.timersActive = false;
 
 	/* Prikazivanje kursor-a */
 	glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
@@ -385,9 +385,9 @@ void pauseTimers()
 	glutPostRedisplay();
 }
 
-void unpauseTimers() 
+static void unpauseTimers() 
 {
-	globalData.timersPaused = false;
+	globalData.timersActive = true;
 
 	/* Sakrivanje kursor-a */
 	glutSetCursor(GLUT_CURSOR_NONE);
@@ -407,7 +407,7 @@ void unpauseTimers()
 static void fx_timer(int value)
 {
 
-	if (value != globalData.fxTimerId || globalData.timersPaused)
+	if (value != globalData.fxTimerId || !globalData.timersActive)
 		return;
 
 	/***************************************************

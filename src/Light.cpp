@@ -34,7 +34,7 @@ void Light::init() {
 	if (lightID < 7) {
 		Light::lightCounter++;
 	} else if (lightID >= 7) {
-		std::cout << "Maximum lights reached" << std::endl;
+		//std::cout << "Maximum lights reached" << std::endl;
 	} else {
 		std::cout << "Unknown behavior LIGHT constructor" << std::endl;
 	}
