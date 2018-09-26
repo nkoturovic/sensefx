@@ -1,7 +1,7 @@
 #ifndef SENSEFX_MATERIAL_H
 #define SENSEFX_MATERIAL_H
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 #include <string>
 #include <map>

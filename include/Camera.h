@@ -2,8 +2,8 @@
 #define SENSEFX_CAMERA_H
 
 #include "Object.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 class Camera {
 

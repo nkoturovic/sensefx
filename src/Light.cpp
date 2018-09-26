@@ -1,5 +1,5 @@
 #include "Light.h"
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/type_ptr.hpp"
 
 #include <GL/gl.h>
 #include <GL/glu.h>

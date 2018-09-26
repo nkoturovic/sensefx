@@ -2,7 +2,7 @@
 #define SENSEFX_LIGHT_H
 
 #include "Object.h"
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 #include <string>
 #include <map>
 

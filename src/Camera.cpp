@@ -3,8 +3,8 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 Camera::Camera(Object * attachTo) : matrix(1.0f), attachedTo(attachTo) {}
 Camera::Camera() : Camera(NULL) {}

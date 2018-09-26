@@ -1,7 +1,7 @@
 #ifndef SENSEFX_MODEL_H
 #define SENSEFX_MODEL_H
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 #include <vector>
 #include <string>

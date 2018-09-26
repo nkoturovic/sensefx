@@ -1,7 +1,7 @@
 #ifndef SENSEFX_TEXT_H
 #define SENSEFX_TEXT_H
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 #include <string>
 
 class Text {

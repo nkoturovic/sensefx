@@ -7,9 +7,9 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtx/matrix_decompose.hpp"
 
 /* Konstruktori */
 DrawableObject::DrawableObject(Object * parent, glm::vec4 color) : Object(parent), color(color) {}

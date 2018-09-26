@@ -6,7 +6,7 @@
 #include <GL/glut.h>
 #include "DataContainer.h"
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 extern DataContainer globalData;
 
