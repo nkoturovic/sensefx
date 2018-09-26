@@ -6,13 +6,13 @@
 **MP4 demo snimak:** Postoji i demo snimak u mp4 formatu rezolucije 800x600 koji se nalazi u direktorijumu projekta examples_video.
 
 ## Requirements
-   Linux, [g++ (c++17)](https://gcc.gnu.org/), [OpenGL](https://www.opengl.org/), [glut](https://www.opengl.org/resources/libraries/glut/), [glm](https://glm.g-truc.net/0.9.8/index.html)
+   Linux, [g++ (c++17)](https://gcc.gnu.org/), [OpenGL](https://www.opengl.org/), [glut](https://www.opengl.org/resources/libraries/glut/)
 
 ## Instalacija
 ### Ubuntu/Debian
-      sudo apt-get install freeglut3-dev libglm-dev
+      sudo apt-get install freeglut3-dev
 ### Arch/Manjaro Linux
-      sudo pacman -Sy freeglut glm
+      sudo pacman -Sy freeglut
 
 ## Kompilacija
 Shell programom doći u direktorijum projekta i ukucati: `make`
