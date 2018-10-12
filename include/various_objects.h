@@ -24,11 +24,12 @@ class CTexObject : public ColidableObject, public TexturedObject {
 class Room : public TransformableObject , public DrawableObject {
 
 	private:
-		std::vector <Object *> collisionList = {&frontWall, &backWall, &leftWall, &rightWall, &ceilingColider, &floorColider};
 
-		CTObject floorColider, ceilingColider;
 		CTexObject frontWall, backWall, leftWall, rightWall;
+		CTObject floorColider, ceilingColider;
 		TexturedObject ceiling, floor;
+
+		std::vector <Object *> collisionList = {&frontWall, &backWall, &leftWall, &rightWall, &ceilingColider, &floorColider};
 
 		/* Implicitno default parametri */
 		glm::vec4 color = glm::vec4(1,1,1,1);
