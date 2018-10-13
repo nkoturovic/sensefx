@@ -83,6 +83,7 @@ int main(int argc, char * argv[])
 
 	const char * title = appConfig.getParameter("TITLE").c_str();
 	glutCreateWindow(title);
+	glutFullScreen(); 
 
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glEnable(GL_DEPTH_TEST);
